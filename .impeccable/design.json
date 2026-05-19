@@ -1,0 +1,232 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-05-19T00:00:00.000Z",
+  "title": "Design System: CntxtCS",
+  "extensions": {
+    "colorMeta": {
+      "signal-violet": {
+        "role": "primary",
+        "displayName": "Signal Violet",
+        "canonical": "oklch(0.52 0.28 303)",
+        "hex": "#aa3bff",
+        "tonalRamp": [
+          "oklch(0.95 0.05 303)",
+          "oklch(0.85 0.12 303)",
+          "oklch(0.72 0.20 303)",
+          "oklch(0.52 0.28 303)",
+          "oklch(0.38 0.22 303)",
+          "oklch(0.25 0.14 303)"
+        ]
+      },
+      "signal-violet-dim": {
+        "role": "primary-dark",
+        "displayName": "Signal Violet Dim",
+        "canonical": "oklch(0.65 0.22 300)",
+        "hex": "#c084fc",
+        "notes": "Dark-mode variant of Signal Violet. Reduced chroma prevents glare on dark backgrounds."
+      },
+      "source-white": {
+        "role": "neutral-bg",
+        "displayName": "Source White",
+        "canonical": "oklch(1 0 0)",
+        "hex": "#ffffff"
+      },
+      "graphite-near": {
+        "role": "neutral-surface",
+        "displayName": "Graphite Near",
+        "canonical": "oklch(0.985 0 0)",
+        "hex": "#fafafa",
+        "notes": "Sidebar background in light mode."
+      },
+      "graphite-subtle": {
+        "role": "neutral-muted-bg",
+        "displayName": "Graphite Subtle",
+        "canonical": "oklch(0.97 0 0)",
+        "hex": "#f5f5f5",
+        "notes": "Hover fills, muted container backgrounds."
+      },
+      "graphite-border": {
+        "role": "neutral-border",
+        "displayName": "Graphite Border",
+        "canonical": "oklch(0.922 0 0)",
+        "hex": "#ebebeb",
+        "notes": "All structural borders and dividers."
+      },
+      "graphite-inactive": {
+        "role": "neutral-muted-fg",
+        "displayName": "Graphite Inactive",
+        "canonical": "oklch(0.556 0 0)",
+        "hex": "#737373",
+        "notes": "Muted text, inactive nav, icon fills at rest."
+      },
+      "graphite-surface": {
+        "role": "neutral-dark-surface",
+        "displayName": "Graphite Surface",
+        "canonical": "oklch(0.205 0 0)",
+        "hex": "#2e2e2e",
+        "notes": "Active nav bg in light mode; card surface in dark mode."
+      },
+      "graphite-deep": {
+        "role": "neutral-fg",
+        "displayName": "Graphite Deep",
+        "canonical": "oklch(0.145 0 0)",
+        "hex": "#1c1c1c",
+        "notes": "Primary text and primary button background."
+      },
+      "destructive": {
+        "role": "danger",
+        "displayName": "Alert Red",
+        "canonical": "oklch(0.577 0.245 27.325)",
+        "hex": "#ef4444"
+      }
+    },
+    "typographyMeta": {
+      "headline": { "displayName": "Headline", "purpose": "Page-level titles. One per route." },
+      "title":    { "displayName": "Title",    "purpose": "Section subheadings, selected node names in detail panels." },
+      "body":     { "displayName": "Body",     "purpose": "Primary interface text. Max line length 65ch." },
+      "label":    { "displayName": "Label",    "purpose": "Metadata, column headers, muted-foreground contexts." },
+      "mono":     { "displayName": "Mono",     "purpose": "Code, counters, fully-qualified names, tabular numbers." }
+    },
+    "shadows": [
+      {
+        "name": "surface-rest",
+        "value": "none",
+        "purpose": "Default for all surfaces. Borders carry spatial relationships."
+      },
+      {
+        "name": "surface-raised",
+        "value": "rgba(0,0,0,0.10) 0 10px 15px -3px, rgba(0,0,0,0.05) 0 4px 6px -2px",
+        "purpose": "Elevated cards and panels that need to read as lifted."
+      },
+      {
+        "name": "overlay",
+        "value": "rgba(0,0,0,0.40) 0 10px 15px -3px, rgba(0,0,0,0.25) 0 4px 6px -2px",
+        "purpose": "Dark-mode overlays: dropdown menus, sheet panels, floating sidebars."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-standard",
+        "value": "cubic-bezier(0.4, 0, 0.2, 1)",
+        "purpose": "Default easing for all state transitions."
+      },
+      {
+        "name": "ease-out-quart",
+        "value": "cubic-bezier(0.25, 1, 0.5, 1)",
+        "purpose": "Entries and reveals. Exits use ease-standard."
+      },
+      {
+        "name": "duration-fast",
+        "value": "120ms",
+        "purpose": "Hover color changes, button presses."
+      },
+      {
+        "name": "duration-standard",
+        "value": "200ms",
+        "purpose": "Panel open/close, tab transitions."
+      }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "640px" },
+      { "name": "md", "value": "768px" },
+      { "name": "lg", "value": "1024px" },
+      { "name": "xl", "value": "1280px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-default",
+      "description": "Default action button. Graphite Deep background with Source White text.",
+      "html": "<button class=\"ds-btn-primary\">Re-scan</button>",
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; justify-content: center; height: 32px; padding: 0 10px; background: oklch(0.145 0 0); color: oklch(1 0 0); font-family: 'Geist Variable', sans-serif; font-size: 0.875rem; font-weight: 500; border: none; border-radius: 10px; cursor: pointer; transition: background 120ms cubic-bezier(0.4, 0, 0.2, 1), transform 120ms cubic-bezier(0.4, 0, 0.2, 1); outline: none; } .ds-btn-primary:hover { background: oklch(0.205 0 0); } .ds-btn-primary:focus-visible { box-shadow: 0 0 0 3px oklch(0.52 0.28 303 / 0.5); } .ds-btn-primary:active { transform: translateY(1px); } .ds-btn-primary:disabled { opacity: 0.5; pointer-events: none; }"
+    },
+    {
+      "name": "Ghost Button",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Tertiary action. No background at rest; subtle fill on hover.",
+      "html": "<button class=\"ds-btn-ghost\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M3 12a9 9 0 1 0 18 0 9 9 0 0 0-18 0\"/><path d=\"M12 8v4l3 3\"/></svg> Refresh</button>",
+      "css": ".ds-btn-ghost { display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 10px; background: transparent; color: oklch(0.556 0 0); font-family: 'Geist Variable', sans-serif; font-size: 0.875rem; font-weight: 500; border: none; border-radius: 10px; cursor: pointer; transition: background 120ms cubic-bezier(0.4, 0, 0.2, 1), color 120ms cubic-bezier(0.4, 0, 0.2, 1); outline: none; } .ds-btn-ghost:hover { background: oklch(0.97 0 0); color: oklch(0.145 0 0); } .ds-btn-ghost:focus-visible { box-shadow: 0 0 0 3px oklch(0.52 0.28 303 / 0.5); }"
+    },
+    {
+      "name": "Sidebar Nav Item — Active",
+      "kind": "nav",
+      "refersTo": "nav-item-active",
+      "description": "Active route in the sidebar navigation.",
+      "html": "<a class=\"ds-nav-active\" href=\"#\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><rect width=\"18\" height=\"18\" x=\"3\" y=\"3\" rx=\"2\" ry=\"2\"/><line x1=\"3\" x2=\"21\" y1=\"9\" y2=\"9\"/><line x1=\"3\" x2=\"21\" y1=\"15\" y2=\"15\"/><line x1=\"9\" x2=\"9\" y1=\"3\" y2=\"21\"/><line x1=\"15\" x2=\"15\" y1=\"3\" y2=\"21\"/></svg>Dashboard</a>",
+      "css": ".ds-nav-active { display: flex; align-items: center; gap: 10px; height: auto; padding: 8px 12px; background: oklch(0.145 0 0); color: oklch(1 0 0); font-family: 'Geist Variable', sans-serif; font-size: 0.875rem; font-weight: 500; border-radius: 10px; text-decoration: none; transition: background 120ms cubic-bezier(0.4, 0, 0.2, 1); }"
+    },
+    {
+      "name": "Sidebar Nav Item — Default",
+      "kind": "nav",
+      "refersTo": "nav-item-default",
+      "description": "Inactive route in the sidebar navigation.",
+      "html": "<a class=\"ds-nav-default\" href=\"#\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><circle cx=\"12\" cy=\"12\" r=\"10\"/><path d=\"M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z\"/></svg>Graph</a>",
+      "css": ".ds-nav-default { display: flex; align-items: center; gap: 10px; height: auto; padding: 8px 12px; background: transparent; color: oklch(0.556 0 0); font-family: 'Geist Variable', sans-serif; font-size: 0.875rem; font-weight: 500; border-radius: 10px; text-decoration: none; transition: background 120ms cubic-bezier(0.4, 0, 0.2, 1), color 120ms cubic-bezier(0.4, 0, 0.2, 1); } .ds-nav-default:hover { background: oklch(0.97 0 0); color: oklch(0.145 0 0); }"
+    },
+    {
+      "name": "Card",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "Container for grouped content. Flat by default; shadow added only when elevation is required.",
+      "html": "<div class=\"ds-card\"><div class=\"ds-card-header\"><span class=\"ds-card-title\">Source Files</span><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z\"/><polyline points=\"14 2 14 8 20 8\"/></svg></div><div class=\"ds-card-body\"><span class=\"ds-stat-value\">1,284</span></div></div>",
+      "css": ".ds-card { background: oklch(1 0 0); border: 1px solid oklch(0.922 0 0); border-radius: 10px; overflow: hidden; } .ds-card-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 16px 8px; color: oklch(0.556 0 0); } .ds-card-title { font-family: 'Geist Variable', sans-serif; font-size: 0.875rem; font-weight: 500; color: oklch(0.556 0 0); } .ds-card-body { padding: 0 16px 16px; } .ds-stat-value { font-family: 'Geist Variable', sans-serif; font-size: 1.875rem; font-weight: 700; color: oklch(0.145 0 0); font-variant-numeric: tabular-nums; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Static Analyzer",
+    "overview": "CntxtCS operates like a static analysis tool applied to its own interface. The same qualities that make a compiler or linter valuable — precision, structured output, zero noise, authority — govern every design decision here. The interface does not celebrate itself. It processes, reports, navigates.\n\nThe aesthetic reference is VS Code's Explorer panel meeting Claude Code's terminal-adjacent calm: dense without being hostile, structured without being rigid, informative without being loud. This is not a SaaS dashboard showcasing its own activity. It is a working surface for working developers.\n\nThe theme follows the user's environment (light / dark / system), with full support for tweakcn theme overrides. All tokens are CSS custom properties.",
+    "keyCharacteristics": [
+      "Single typeface (Geist Variable); weight is the hierarchy instrument",
+      "Neutral base with Signal Violet as the sole intentional accent",
+      "Flat-by-default surfaces; shadows appear only to communicate elevation or state",
+      "Graph canvas node colors are categorical and independent of the UI palette",
+      "Every label earns its place; metadata is muted, not absent"
+    ],
+    "rules": [
+      {
+        "name": "The One Accent Rule",
+        "body": "Signal Violet appears on ≤10% of any given screen. Every use must mark something: active state, focus ring, selection indicator, or accent border. Decorative violet is disqualifying.",
+        "section": "colors"
+      },
+      {
+        "name": "The Graph Firewall Rule",
+        "body": "Node colors are categorical data. Never repurpose #7c3aed or #2563eb in surface UI. The graph canvas is a data layer; the surface layer has its own color logic.",
+        "section": "colors"
+      },
+      {
+        "name": "The Weight Hierarchy Rule",
+        "body": "Scale alone does not create hierarchy. Every step up in visual prominence requires a weight increase of ≥100 units. A 12px/500 label over a 14px/400 body is correct. A 14px/400 heading over 14px/400 body is invisible structure.",
+        "section": "typography"
+      },
+      {
+        "name": "The Flat-By-Default Rule",
+        "body": "A surface is flat until proven otherwise. Elevation is earned by function, not applied for visual interest. If the surface neither floats nor occludes, it has no shadow.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Use Signal Violet exclusively for active states, focus rings, and accent borders",
+      "Use borders (1px solid graphite-border) as the default spatial separator",
+      "Use Geist Variable with weight contrast (≥100 units) rather than scale alone",
+      "Keep tabular-nums on any numeric data that may change",
+      "Keep graph node colors isolated to the canvas layer",
+      "Ensure every interactive element has a visible keyboard focus state",
+      "Reduce Signal Violet chroma in dark mode (#c084fc instead of #aa3bff)",
+      "Support prefers-reduced-motion: remove transitions and active-press effects"
+    ],
+    "donts": [
+      "Don't add gradient banners, colored header bars, or accent fills to structural surfaces",
+      "Don't use the SaaS hero-metric template: big number + small label + supporting stats + gradient accent",
+      "Don't use side-stripe borders (border-left > 1px as colored accent) on cards or list items",
+      "Don't use gradient text (background-clip: text). Emphasis is weight or size only",
+      "Don't use glassmorphism effects. Blurs and translucency have no role in this system",
+      "Don't render graph node colors outside the graph canvas",
+      "Don't introduce a second typeface",
+      "Don't nest cards. Flatten or use a section within the card",
+      "Don't treat every data group as a card — tables and bordered sections are lower-noise alternatives"
+    ]
+  }
+}
