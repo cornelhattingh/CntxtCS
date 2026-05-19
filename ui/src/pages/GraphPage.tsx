@@ -43,6 +43,23 @@ export function GraphPage() {
     })
   }
 
+  function handleShowAll() {
+    setVisibleTypes(new Set(allTypes))
+  }
+
+  function handleHideAll() {
+    setVisibleTypes(new Set())
+  }
+
+  const typeCounts = useMemo(
+    () =>
+      graphData.nodes.reduce<Record<string, number>>((acc, n) => {
+        acc[n.type] = (acc[n.type] ?? 0) + 1
+        return acc
+      }, {}),
+    [graphData],
+  )
+
   function handleNodeClick(node: GraphNode) {
     setSelectedNode(node)
     setSheetOpen(true)
@@ -70,7 +87,7 @@ export function GraphPage() {
         </div>
         {loading
           ? Array.from({ length: 6 }).map((_, i) => <Skeleton key={i} className="h-5 w-full" />)
-          : <NodeTypeFilter types={allTypes} visible={visibleTypes} onToggle={toggleType} />}
+          : <NodeTypeFilter types={allTypes} visible={visibleTypes} onToggle={toggleType} typeCounts={typeCounts} onShowAll={handleShowAll} onHideAll={handleHideAll} />}
       </aside>
 
       {/* Graph canvas */}

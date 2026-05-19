@@ -28,14 +28,39 @@ interface NodeTypeFilterProps {
   types: string[]
   visible: Set<string>
   onToggle: (type: string) => void
+  typeCounts?: Record<string, number>
+  onShowAll?: () => void
+  onHideAll?: () => void
 }
 
-export function NodeTypeFilter({ types, visible, onToggle }: NodeTypeFilterProps) {
+export function NodeTypeFilter({ types, visible, onToggle, typeCounts, onShowAll, onHideAll }: NodeTypeFilterProps) {
   return (
     <div className="space-y-2">
-      <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-        Node Types
-      </p>
+      <div className="flex items-center justify-between">
+        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+          Node Types
+        </p>
+        {(onShowAll || onHideAll) && (
+          <div className="flex gap-2">
+            {onShowAll && (
+              <button
+                onClick={onShowAll}
+                className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+              >
+                All
+              </button>
+            )}
+            {onHideAll && (
+              <button
+                onClick={onHideAll}
+                className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+              >
+                None
+              </button>
+            )}
+          </div>
+        )}
+      </div>
       {types.map(t => (
         <label key={t} className="flex items-center gap-2 cursor-pointer">
           <Checkbox
@@ -46,7 +71,12 @@ export function NodeTypeFilter({ types, visible, onToggle }: NodeTypeFilterProps
             className="h-2.5 w-2.5 rounded-full shrink-0"
             style={{ background: nodeColor(t) }}
           />
-          <span className="text-sm capitalize">{t.replace(/_/g, ' ')}</span>
+          <span className="text-sm capitalize flex-1">{t.replace(/_/g, ' ')}</span>
+          {typeCounts !== undefined && (
+            <span className="text-xs text-muted-foreground tabular-nums">
+              {typeCounts[t] ?? 0}
+            </span>
+          )}
         </label>
       ))}
     </div>
