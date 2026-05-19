@@ -166,3 +166,4 @@ cython_debug/
 
 # UV lock file
 uv.lock
+.playwright-mcp/*

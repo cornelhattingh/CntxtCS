@@ -11,19 +11,17 @@ MEM_URL = "mem://"
 def make_test_graph() -> tuple[nx.DiGraph, dict]:
     """Build a minimal test graph matching CntxtCS output format."""
     g = nx.DiGraph()
-    g.add_node("File: src/MyService.cs", type="file", path="src/MyService.cs")
-    g.add_node("Namespace: MyApp.Services", type="namespace", name="MyApp.Services")
-    g.add_node("Class: MyService", type="class", name="MyService", access_modifier="public", modifiers="", inherits=None)
-    g.add_node("Method: DoWork (Class: MyService)", type="method", name="DoWork", access_modifier="public", modifiers="", return_type="void", parameters=[])
-    g.add_edge("File: src/MyService.cs", "Namespace: MyApp.Services", relation="CONTAINS_NAMESPACE")
-    g.add_edge("Namespace: MyApp.Services", "Class: MyService", relation="CONTAINS_CLASS")
-    g.add_edge("Class: MyService", "Method: DoWork (Class: MyService)", relation="HAS_METHOD")
+    g.add_node("File: src/MyService.cs", type="file", path="src/MyService.cs", source_file="src/MyService.cs")
+    g.add_node("Namespace: MyApp.Services", type="namespace", name="MyApp.Services")  # shared — no source_file
+    g.add_node("Class: MyService", type="class", name="MyService", access_modifier="public", modifiers="", inherits=None, source_file="src/MyService.cs")
+    g.add_node("Method: DoWork (Class: MyService)", type="method", name="DoWork", access_modifier="public", modifiers="", return_type="void", parameters=[], source_file="src/MyService.cs")
+    g.add_edge("File: src/MyService.cs", "Namespace: MyApp.Services", relation="CONTAINS_NAMESPACE", source_file="src/MyService.cs")
+    g.add_edge("Namespace: MyApp.Services", "Class: MyService", relation="CONTAINS_CLASS", source_file="src/MyService.cs")
+    g.add_edge("Class: MyService", "Method: DoWork (Class: MyService)", relation="HAS_METHOD", source_file="src/MyService.cs")
     metadata = {
-        "stats": {
-            "total_files": 1, "total_classes": 1, "total_methods": 1,
-            "total_namespaces": 1, "total_interfaces": 0, "total_enums": 0,
-            "total_structs": 0, "total_dependencies": 0, "total_usings": 0,
-        }
+        "total_files": 1, "total_classes": 1, "total_methods": 1,
+        "total_namespaces": 1, "total_interfaces": 0, "total_enums": 0,
+        "total_structs": 0, "total_dependencies": 0, "total_usings": 0,
     }
     return g, metadata
 
@@ -125,3 +123,43 @@ class TestSurrealStorageWithMemory:
             stats = result[0] if result else []
             stats_list = stats if isinstance(stats, list) else [stats]
             assert len(stats_list) >= 1
+
+    def test_delete_file_data_removes_owned_nodes_and_edges(self):
+        graph, metadata = make_test_graph()
+        with SurrealStorage("test_project", url=MEM_URL) as storage:
+            storage.store_graph(graph, metadata)
+            storage.delete_file_data(["src/MyService.cs"])
+
+            # Owned nodes should be gone
+            classes = storage.query("SELECT * FROM class_node")[0] if storage.query("SELECT * FROM class_node") else []
+            assert not any(
+                r.get("node_name") == "Class: MyService"
+                for r in (classes if isinstance(classes, list) else [classes])
+            )
+            methods = storage.query("SELECT * FROM method_node")[0] if storage.query("SELECT * FROM method_node") else []
+            assert not any(
+                r.get("node_name") == "Method: DoWork (Class: MyService)"
+                for r in (methods if isinstance(methods, list) else [methods])
+            )
+            # Edges from this file should be gone
+            has_method = storage.query("SELECT * FROM has_method")[0] if storage.query("SELECT * FROM has_method") else []
+            assert len(has_method if isinstance(has_method, list) else [has_method]) == 0
+            # Namespace node should still exist (shared)
+            namespaces = storage.query("SELECT * FROM namespace")[0] if storage.query("SELECT * FROM namespace") else []
+            assert len(namespaces if isinstance(namespaces, list) else [namespaces]) >= 1
+
+    def test_store_graph_update_stats_false_skips_stats(self):
+        graph, metadata = make_test_graph()
+        with SurrealStorage("test_project", url=MEM_URL) as storage:
+            # First store with stats
+            storage.store_graph(graph, metadata)
+            result_before = storage.query("SELECT * FROM codebase_stats")
+            stats_before = (result_before[0] if result_before else []) or []
+            stats_before = stats_before if isinstance(stats_before, list) else [stats_before]
+            # Now store without updating stats
+            storage.store_graph(graph, {}, update_stats=False)
+            result_after = storage.query("SELECT * FROM codebase_stats")
+            stats_after = (result_after[0] if result_after else []) or []
+            stats_after = stats_after if isinstance(stats_after, list) else [stats_after]
+            # Stats unchanged — still from first store
+            assert len(stats_before) == len(stats_after)

@@ -38,57 +38,77 @@ It's like handing your LLM the cliff notes instead of a novel.
 - 📈 Built-in visualization capabilities of your project's knowledge graph
 - 🚀 Support for modern .NET frameworks and patterns
 - 🗄️ SurrealDB persistence — store multiple projects, query with SurrealQL
-- 🤖 MCP server — AI agents can query your codebase via 12 structured tools
+- 🤖 MCP server — 13 structured tools for AI agents (GitHub Copilot, Claude Code, Claude Desktop)
+- 👁️ File watcher — auto re-analyses when `.cs` or `.csproj` files change
 
 ## 🚀 Quick Start
 
 ```bash
 # Clone the repository
 git clone https://github.com/brandondocusen/CntxtCS.git
-
-# Navigate to the directory
 cd CntxtCS
 
-# Install dependencies with UV
+# Install dependencies with UV (no system Python required)
 uv sync
+```
 
-# Run interactively (will prompt for directory)
+### Option A — Serve mode (recommended)
+
+One command: analyse your codebase, start the MCP server, and watch for changes.
+
+```bash
+uv run python mcp_server.py \
+  --directory /path/to/your/csharp/project \
+  --project my-api \
+  --watch
+```
+
+This is all you need for day-to-day use. Configure your AI agent host to run this command (see [MCP Server setup](#-mcp-server)) and it handles everything automatically.
+
+### Option B — Standalone analyser
+
+Generate a JSON knowledge graph without SurrealDB. Useful for uploading directly to an LLM chat.
+
+```bash
+# Interactive (prompts for directory)
 uv run python CntxtCS.py
 
 # Or pass the directory directly
 uv run python CntxtCS.py /path/to/your/csharp/project
 ```
 
-When prompted, enter the path to your C# solution or project file. The tool will generate a `cs_code_knowledge_graph.json` file and offer to visualize the relationships.
+This generates `cs_code_knowledge_graph.json` and optionally visualises the graph.
 
-## 🗄️ SurrealDB Integration
+## 🗄️ SurrealDB Setup
 
-Store your knowledge graph in SurrealDB for persistent, queryable storage — enabling AI agents to query your codebase via the [MCP server](#-mcp-server).
+CntxtCS uses SurrealDB to store knowledge graphs persistently. Each project gets its own database inside a fixed `cntxt` namespace, so multiple codebases can live side by side.
 
-### Prerequisites
-
-1. Install and start [SurrealDB](https://surrealdb.com/install):
-   ```bash
-   surreal start --user root --pass root
-   ```
-
-2. Copy the environment template and configure your connection:
-   ```bash
-   cp .env.example .env
-   ```
-   Edit `.env`:
-   ```
-   SURREAL_URL=ws://localhost:8000
-   SURREAL_USER=root
-   SURREAL_PASS=root
-   ```
-
-### Analysing with SurrealDB storage
-
-Pass `--surreal` and `--project <name>` when running the analyser. Each project gets its own database inside the `cntxt` namespace in SurrealDB.
+### 1. Start SurrealDB
 
 ```bash
-# Analyse and store in SurrealDB under project name "my-api"
+surreal start --user root --pass root
+```
+
+See the [SurrealDB install guide](https://surrealdb.com/install) for platform-specific instructions.
+
+### 2. Configure the connection
+
+```bash
+cp .env.example .env
+```
+
+Edit `.env`:
+```
+SURREAL_URL=ws://localhost:8000
+SURREAL_USER=root
+SURREAL_PASS=root
+```
+
+### 3. Analyse and store
+
+The **recommended** way is to let the MCP server handle this (see [Serve mode](#option-a--serve-mode-recommended)). For CI/CD pipelines or one-off imports, you can also run the analyser directly:
+
+```bash
 uv run python CntxtCS.py /path/to/your/csharp/project --surreal --project my-api
 ```
 
@@ -96,32 +116,19 @@ Re-running with the same `--project` name will **upsert** (merge) — existing r
 
 ## 🤖 MCP Server
 
-The MCP server exposes your stored knowledge graphs as tools that AI agents (GitHub Copilot, Claude, etc.) can call directly.
+The MCP server exposes your C# knowledge graphs as structured tools that AI agents call directly — no manual file uploads or prompt stuffing required.
 
-### Starting the server
+### Server modes
 
-The MCP server has two modes:
+| Mode | Command | When to use |
+|------|---------|-------------|
+| **Serve + watch** | `mcp_server.py --directory ... --project ... --watch` | Local development — auto re-analyses on file save |
+| **Serve** | `mcp_server.py --directory ... --project ...` | CI/production — analyse once at startup |
+| **Query only** | `mcp_server.py` | SurrealDB already populated; just serve tools |
 
-**Query-only** (pre-existing SurrealDB data required):
-```bash
-uv run python mcp_server.py
-```
+### VS Code — GitHub Copilot
 
-**Serve mode** — analyse the codebase first, then start the server:
-```bash
-uv run python mcp_server.py --directory ./MyProject --project my-api
-```
-
-**Serve + watch** — auto re-analyse whenever `.cs` or `.csproj` files change:
-```bash
-uv run python mcp_server.py --directory ./MyProject --project my-api --watch
-```
-
-This is the recommended mode for local development and deployment — a single command handles everything.
-
-### Configuring in VS Code (GitHub Copilot)
-
-Add to your `.vscode/mcp.json` (or user-level `mcp.json`):
+Create `.vscode/mcp.json` in your workspace (or add to your user-level `mcp.json`):
 
 ```json
 {
@@ -131,7 +138,7 @@ Add to your `.vscode/mcp.json` (or user-level `mcp.json`):
       "command": "uv",
       "args": [
         "run", "python", "mcp_server.py",
-        "--directory", "/path/to/your/csharp/project",
+        "--directory", "${workspaceFolder}",
         "--project", "my-api",
         "--watch"
       ],
@@ -141,9 +148,47 @@ Add to your `.vscode/mcp.json` (or user-level `mcp.json`):
 }
 ```
 
-### Configuring in Claude Desktop
+> **Tip:** Use `${workspaceFolder}` so the directory always points to the currently open project.
 
-Add to `claude_desktop_config.json`:
+Enable the server via **GitHub Copilot** → **MCP Servers** in the VS Code sidebar, or reload the window.
+
+### Claude Code
+
+Run once to register the server permanently:
+
+```bash
+claude mcp add cntxtcs -- uv run python /path/to/CntxtCS/mcp_server.py \
+  --directory /path/to/your/csharp/project \
+  --project my-api \
+  --watch
+```
+
+Or add it to `.claude/settings.json` in your project root for project-scoped access:
+
+```json
+{
+  "mcpServers": {
+    "cntxtcs": {
+      "command": "uv",
+      "args": [
+        "run", "python", "/path/to/CntxtCS/mcp_server.py",
+        "--directory", ".",
+        "--project", "my-api",
+        "--watch"
+      ]
+    }
+  }
+}
+```
+
+Verify it's registered:
+```bash
+claude mcp list
+```
+
+### Claude Desktop
+
+Add to `claude_desktop_config.json` (macOS: `~/Library/Application Support/Claude/`, Windows: `%APPDATA%\Claude\`):
 
 ```json
 {
@@ -162,43 +207,53 @@ Add to `claude_desktop_config.json`:
 }
 ```
 
-### Triggering re-analysis from CI/CD or git hooks
+Restart Claude Desktop after saving.
 
-The `reanalyze()` MCP tool lets agents (or scripts) trigger a fresh analysis at any time. For automated pipelines, call it via the MCP client, or set up a **post-commit git hook**:
+### CI/CD and git hooks
+
+The `reanalyze()` tool can be called by agents at any time to trigger a fresh analysis. For fully automated pipelines, run the analyser directly as a build step:
 
 ```bash
-# .git/hooks/post-commit
-#!/bin/sh
-# Re-analyse after every commit so the knowledge graph stays current.
-# Requires the MCP server to be running with --directory and --project.
-uv run python CntxtCS.py "$(git rev-parse --show-toplevel)" --surreal --project my-api
+# In your CI pipeline
+uv run python CntxtCS.py "$REPO_ROOT" --surreal --project my-api
 ```
 
-### Available MCP Tools
+Or add a **post-commit git hook** so the graph stays current after every commit:
+
+```bash
+# .git/hooks/post-commit  (chmod +x)
+#!/bin/sh
+uv --directory /path/to/CntxtCS run python CntxtCS.py \
+  "$(git rev-parse --show-toplevel)" \
+  --surreal --project my-api
+```
+
+### Available tools
 
 | Tool | Description |
 |------|-------------|
 | `list_projects()` | Discover all analysed projects — **start here** |
+| `reanalyze(project?, directory?)` | Re-analyse the codebase and refresh the graph |
 | `get_codebase_stats(project)` | File/class/method/namespace counts |
 | `get_file_structure(project)` | All C# source files |
 | `list_namespaces(project)` | All namespace names |
-| `list_classes(project, access_modifier?)` | Classes with optional access filter |
+| `list_classes(project, access_modifier?)` | Classes with optional access modifier filter |
 | `get_class_details(project, class_name)` | Full class info: methods, properties, fields, events, inheritance |
 | `get_class_hierarchy(project, class_name)` | Parent and child classes |
 | `list_interfaces(project)` | All interfaces |
-| `find_implementations(project, interface_name)` | Classes implementing an interface |
-| `list_methods(project, name_filter?, return_type?)` | Methods with search filters |
+| `find_implementations(project, interface_name)` | Classes that implement an interface |
+| `list_methods(project, name_filter?, return_type?)` | Methods with search and return-type filters |
 | `list_dependencies(project)` | NuGet packages with versions |
-| `search_code_elements(project, query, type_filter?)` | Full-text search across all element types |
+| `search_code_elements(project, query, type_filter?)` | Search by name across all element types |
 
-### Agent onboarding flow
+### Agent onboarding pattern
 
-Agents should follow this pattern when first connecting:
+When an agent connects for the first time it should:
 
-1. Call `list_projects()` to see available projects
-2. Choose a project name
-3. Optionally call `get_codebase_stats(project)` for an overview
-4. Use targeted tools: `list_classes`, `get_class_details`, `find_implementations`, etc.
+1. Call `list_projects()` to discover available projects
+2. Call `get_codebase_stats(project)` for a high-level overview
+3. Use targeted tools to explore: `list_classes`, `get_class_details`, `find_implementations`, etc.
+4. Call `reanalyze()` whenever the codebase changes and fresh data is needed
 
 ## 💡 Example Usage with LLMs
 

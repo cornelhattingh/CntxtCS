@@ -17,28 +17,29 @@ _shared_storage = None
 
 def _seed_storage(project: str = TEST_PROJECT) -> SurrealStorage:
     g = nx.DiGraph()
-    g.add_node("File: src/UserService.cs", type="file", path="src/UserService.cs")
-    g.add_node("Namespace: MyApp.Services", type="namespace", name="MyApp.Services")
+    src = "src/UserService.cs"
+    g.add_node("File: src/UserService.cs", type="file", path=src, source_file=src)
+    g.add_node("Namespace: MyApp.Services", type="namespace", name="MyApp.Services")  # shared
     g.add_node("Class: UserService", type="class", name="UserService",
-               access_modifier="public", modifiers="", inherits="IUserService")
+               access_modifier="public", modifiers="", inherits="IUserService", source_file=src)
     g.add_node("Interface: IUserService", type="interface", name="IUserService",
-               access_modifier="public", modifiers="", inherits=None)
+               access_modifier="public", modifiers="", inherits=None, source_file=src)
     g.add_node("Method: GetUser (Class: UserService)", type="method", name="GetUser",
                access_modifier="public", modifiers="", return_type="User",
-               parameters=[{"name": "id", "type": "int"}])
+               parameters=[{"name": "id", "type": "int"}], source_file=src)
     g.add_node("Method: CreateUser (Class: UserService)", type="method", name="CreateUser",
                access_modifier="public", modifiers="async", return_type="Task",
-               parameters=[])
+               parameters=[], source_file=src)
     g.add_node("Dependency: Newtonsoft.Json", type="dependency",
-               name="Newtonsoft.Json", version="13.0.1")
-    g.add_edge("Namespace: MyApp.Services", "Class: UserService", relation="CONTAINS_CLASS")
-    g.add_edge("Namespace: MyApp.Services", "Interface: IUserService", relation="CONTAINS_INTERFACE")
-    g.add_edge("Class: UserService", "Method: GetUser (Class: UserService)", relation="HAS_METHOD")
-    g.add_edge("Class: UserService", "Method: CreateUser (Class: UserService)", relation="HAS_METHOD")
-    g.add_edge("Class: UserService", "Interface: IUserService", relation="INHERITS")
-    metadata = {"stats": {"total_files": 1, "total_classes": 1, "total_methods": 2,
-                          "total_interfaces": 1, "total_enums": 0, "total_structs": 0,
-                          "total_namespaces": 1, "total_dependencies": 1, "total_usings": 0}}
+               name="Newtonsoft.Json", version="13.0.1", source_file=src)
+    g.add_edge("Namespace: MyApp.Services", "Class: UserService", relation="CONTAINS_CLASS", source_file=src)
+    g.add_edge("Namespace: MyApp.Services", "Interface: IUserService", relation="CONTAINS_INTERFACE", source_file=src)
+    g.add_edge("Class: UserService", "Method: GetUser (Class: UserService)", relation="HAS_METHOD", source_file=src)
+    g.add_edge("Class: UserService", "Method: CreateUser (Class: UserService)", relation="HAS_METHOD", source_file=src)
+    g.add_edge("Class: UserService", "Interface: IUserService", relation="INHERITS", source_file=src)
+    metadata = {"total_files": 1, "total_classes": 1, "total_methods": 2,
+                 "total_interfaces": 1, "total_enums": 0, "total_structs": 0,
+                 "total_namespaces": 1, "total_dependencies": 1, "total_usings": 0}
     storage = SurrealStorage(project, url=MEM_URL)
     storage.connect()
     storage.store_graph(g, metadata)

@@ -29,6 +29,7 @@ class CSCodeKnowledgeGraph:
 
         # Map of analyzed files to prevent circular dependencies.
         self.analyzed_files = set()
+        self._current_source_file: str = ""
 
         # Map exported entities to their defining files.
         self.exports_map: Dict[str, List[str]] = {}
@@ -96,11 +97,19 @@ class CSCodeKnowledgeGraph:
                 if file.endswith(".cs"):
                     file_path = os.path.join(root, file)
                     self._process_file(file_path)
-                elif file.endswith((".csproj", "packages.config", "packages.lock.json")):
+                elif file.endswith((".csproj", "packages.config", "packages.lock.json")) or file == "Directory.Packages.props":
                     file_path = os.path.join(root, file)
                     self._process_dependency_file(file_path)
 
         print(f"\n\nCompleted processing {self.files_processed} files across {self.dirs_processed} directories")
+
+    def analyze_files(self, file_paths: list[str]) -> None:
+        """Process only the given files and build a partial graph for incremental upserts."""
+        for file_path in file_paths:
+            if file_path.endswith(".cs"):
+                self._process_file(file_path)
+            elif file_path.endswith((".csproj", "packages.config", "packages.lock.json")) or os.path.basename(file_path) == "Directory.Packages.props":
+                self._process_dependency_file(file_path)
 
     def _process_file(self, file_path: str):
         """Process a file to detect usings, namespaces, classes, methods, etc."""
@@ -116,6 +125,7 @@ class CSCodeKnowledgeGraph:
                 content = f.read()
 
             relative_path = os.path.relpath(file_path, self.directory)
+            self._current_source_file = relative_path
             file_node = f"File: {relative_path}"
 
             # Add to analyzed files set.
@@ -123,7 +133,7 @@ class CSCodeKnowledgeGraph:
 
             # Add file node if it doesn't exist.
             if not self.graph.has_node(file_node):
-                self.graph.add_node(file_node, type="file", path=relative_path)
+                self.graph.add_node(file_node, type="file", path=relative_path, source_file=relative_path)
 
             # Process the file contents.
             self._process_usings(content, file_node)
@@ -145,7 +155,7 @@ class CSCodeKnowledgeGraph:
                 if not self.graph.has_node(using_node):
                     self.graph.add_node(using_node, type="namespace", name=namespace)
 
-                self.graph.add_edge(file_node, using_node, relation="USES_NAMESPACE")
+                self.graph.add_edge(file_node, using_node, relation="USES_NAMESPACE", source_file=self._current_source_file)
                 self.total_usings += 1
 
                 # Track dependencies if it's an external library
@@ -169,7 +179,7 @@ class CSCodeKnowledgeGraph:
                 if not self.graph.has_node(namespace_node):
                     self.graph.add_node(namespace_node, type="namespace", name=namespace_name)
 
-                self.graph.add_edge(file_node, namespace_node, relation="CONTAINS_NAMESPACE")
+                self.graph.add_edge(file_node, namespace_node, relation="CONTAINS_NAMESPACE", source_file=self._current_source_file)
                 self.total_namespaces += 1
 
                 # Process classes, interfaces, enums, structs inside namespace
@@ -201,10 +211,11 @@ class CSCodeKnowledgeGraph:
                         name=class_name,
                         access_modifier=access_modifier,
                         modifiers=modifiers.strip(),
-                        inherits=inherits.strip() if inherits else None
+                        inherits=inherits.strip() if inherits else None,
+                        source_file=self._current_source_file
                     )
 
-                self.graph.add_edge(parent_node, class_node, relation="CONTAINS_CLASS")
+                self.graph.add_edge(parent_node, class_node, relation="CONTAINS_CLASS", source_file=self._current_source_file)
                 self.total_classes += 1
 
                 # Get class body to process methods, properties, etc.
@@ -220,8 +231,9 @@ class CSCodeKnowledgeGraph:
                     for base in base_classes:
                         base_node = f"Class: {base}"
                         if not self.graph.has_node(base_node):
-                            self.graph.add_node(base_node, type="class", name=base)
-                        self.graph.add_edge(class_node, base_node, relation="INHERITS")
+                            self.graph.add_node(base_node, type="class", name=base,
+                                                access_modifier="internal", modifiers="")
+                        self.graph.add_edge(class_node, base_node, relation="INHERITS", source_file=self._current_source_file)
 
             except Exception as e:
                 print(f"Error processing class {class_name}: {str(e)}", file=sys.stderr)
@@ -248,10 +260,11 @@ class CSCodeKnowledgeGraph:
                         access_modifier=access_modifier,
                         modifiers=modifiers.strip(),
                         return_type=return_type.strip(),
-                        parameters=self._parse_parameters(parameters)
+                        parameters=self._parse_parameters(parameters),
+                        source_file=self._current_source_file
                     )
 
-                self.graph.add_edge(class_node, method_node, relation="HAS_METHOD")
+                self.graph.add_edge(class_node, method_node, relation="HAS_METHOD", source_file=self._current_source_file)
 
                 # Track class methods.
                 if class_node not in self.class_methods:
@@ -289,10 +302,11 @@ class CSCodeKnowledgeGraph:
                         access_modifier=access_modifier,
                         modifiers=modifiers.strip(),
                         property_type=property_type.strip(),
-                        accessors=accessors.strip()
+                        accessors=accessors.strip(),
+                        source_file=self._current_source_file
                     )
 
-                self.graph.add_edge(class_node, property_node, relation="HAS_PROPERTY")
+                self.graph.add_edge(class_node, property_node, relation="HAS_PROPERTY", source_file=self._current_source_file)
 
             except Exception as e:
                 print(f"Error processing property {property_name}: {str(e)}", file=sys.stderr)
@@ -317,10 +331,11 @@ class CSCodeKnowledgeGraph:
                         name=event_name,
                         access_modifier=access_modifier,
                         modifiers=modifiers.strip(),
-                        event_type=event_type.strip()
+                        event_type=event_type.strip(),
+                        source_file=self._current_source_file
                     )
 
-                self.graph.add_edge(class_node, event_node, relation="HAS_EVENT")
+                self.graph.add_edge(class_node, event_node, relation="HAS_EVENT", source_file=self._current_source_file)
 
             except Exception as e:
                 print(f"Error processing event {event_name}: {str(e)}", file=sys.stderr)
@@ -345,10 +360,11 @@ class CSCodeKnowledgeGraph:
                         name=field_name,
                         access_modifier=access_modifier,
                         modifiers=modifiers.strip(),
-                        field_type=field_type.strip()
+                        field_type=field_type.strip(),
+                        source_file=self._current_source_file
                     )
 
-                self.graph.add_edge(class_node, field_node, relation="HAS_FIELD")
+                self.graph.add_edge(class_node, field_node, relation="HAS_FIELD", source_file=self._current_source_file)
 
             except Exception as e:
                 print(f"Error processing field {field_name}: {str(e)}", file=sys.stderr)
@@ -373,10 +389,11 @@ class CSCodeKnowledgeGraph:
                         name=interface_name,
                         access_modifier=access_modifier,
                         modifiers=modifiers.strip(),
-                        inherits=inherits.strip() if inherits else None
+                        inherits=inherits.strip() if inherits else None,
+                        source_file=self._current_source_file
                     )
 
-                self.graph.add_edge(parent_node, interface_node, relation="CONTAINS_INTERFACE")
+                self.graph.add_edge(parent_node, interface_node, relation="CONTAINS_INTERFACE", source_file=self._current_source_file)
                 self.total_interfaces += 1
 
                 # Get interface body to process methods, properties, etc.
@@ -389,8 +406,9 @@ class CSCodeKnowledgeGraph:
                     for base in base_interfaces:
                         base_node = f"Interface: {base}"
                         if not self.graph.has_node(base_node):
-                            self.graph.add_node(base_node, type="interface", name=base)
-                        self.graph.add_edge(interface_node, base_node, relation="INHERITS_INTERFACE")
+                            self.graph.add_node(base_node, type="interface", name=base,
+                                                access_modifier="internal", modifiers="")
+                        self.graph.add_edge(interface_node, base_node, relation="INHERITS_INTERFACE", source_file=self._current_source_file)
 
             except Exception as e:
                 print(f"Error processing interface {interface_name}: {str(e)}", file=sys.stderr)
@@ -419,10 +437,11 @@ class CSCodeKnowledgeGraph:
                         access_modifier='public',
                         modifiers='abstract',
                         return_type=return_type.strip(),
-                        parameters=self._parse_parameters(parameters)
+                        parameters=self._parse_parameters(parameters),
+                        source_file=self._current_source_file
                     )
 
-                self.graph.add_edge(interface_node, method_node, relation="HAS_METHOD")
+                self.graph.add_edge(interface_node, method_node, relation="HAS_METHOD", source_file=self._current_source_file)
 
                 # Track method parameters and returns.
                 self.method_params[method_node] = self._parse_parameters(parameters)
@@ -450,10 +469,11 @@ class CSCodeKnowledgeGraph:
                         access_modifier='public',
                         modifiers='abstract',
                         property_type=property_type.strip(),
-                        accessors=accessors.strip()
+                        accessors=accessors.strip(),
+                        source_file=self._current_source_file
                     )
 
-                self.graph.add_edge(interface_node, property_node, relation="HAS_PROPERTY")
+                self.graph.add_edge(interface_node, property_node, relation="HAS_PROPERTY", source_file=self._current_source_file)
 
             except Exception as e:
                 print(f"Error processing interface property {property_name}: {str(e)}", file=sys.stderr)
@@ -475,10 +495,11 @@ class CSCodeKnowledgeGraph:
                         enum_node,
                         type="enum",
                         name=enum_name,
-                        access_modifier=access_modifier
+                        access_modifier=access_modifier,
+                        source_file=self._current_source_file
                     )
 
-                self.graph.add_edge(parent_node, enum_node, relation="CONTAINS_ENUM")
+                self.graph.add_edge(parent_node, enum_node, relation="CONTAINS_ENUM", source_file=self._current_source_file)
                 self.total_enums += 1
 
                 # Process enum members
@@ -489,9 +510,10 @@ class CSCodeKnowledgeGraph:
                         self.graph.add_node(
                             member_node,
                             type="enum_member",
-                            name=member
+                            name=member,
+                            source_file=self._current_source_file
                         )
-                    self.graph.add_edge(enum_node, member_node, relation="HAS_MEMBER")
+                    self.graph.add_edge(enum_node, member_node, relation="HAS_MEMBER", source_file=self._current_source_file)
 
             except Exception as e:
                 print(f"Error processing enum {enum_name}: {str(e)}", file=sys.stderr)
@@ -516,10 +538,11 @@ class CSCodeKnowledgeGraph:
                         name=struct_name,
                         access_modifier=access_modifier,
                         modifiers=modifiers.strip(),
-                        inherits=inherits.strip() if inherits else None
+                        inherits=inherits.strip() if inherits else None,
+                        source_file=self._current_source_file
                     )
 
-                self.graph.add_edge(parent_node, struct_node, relation="CONTAINS_STRUCT")
+                self.graph.add_edge(parent_node, struct_node, relation="CONTAINS_STRUCT", source_file=self._current_source_file)
                 self.total_structs += 1
 
                 # Get struct body to process methods, properties, etc.
@@ -534,8 +557,9 @@ class CSCodeKnowledgeGraph:
                     for base in base_types:
                         base_node = f"Struct: {base}"
                         if not self.graph.has_node(base_node):
-                            self.graph.add_node(base_node, type="struct", name=base)
-                        self.graph.add_edge(struct_node, base_node, relation="INHERITS")
+                            self.graph.add_node(base_node, type="struct", name=base,
+                                                access_modifier="internal", modifiers="")
+                        self.graph.add_edge(struct_node, base_node, relation="INHERITS", source_file=self._current_source_file)
 
             except Exception as e:
                 print(f"Error processing struct {struct_name}: {str(e)}", file=sys.stderr)
@@ -619,6 +643,7 @@ class CSCodeKnowledgeGraph:
                 content = f.read()
 
             relative_path = os.path.relpath(file_path, self.directory)
+            self._current_source_file = relative_path
             file_node = f"Dependency File: {relative_path}"
 
             # Add to analyzed files set.
@@ -626,21 +651,36 @@ class CSCodeKnowledgeGraph:
 
             # Add file node if it doesn't exist.
             if not self.graph.has_node(file_node):
-                self.graph.add_node(file_node, type="dependency_file", path=relative_path)
+                self.graph.add_node(file_node, type="dependency_file", path=relative_path, source_file=relative_path)
 
             # Process dependencies
             if file_path.endswith(".csproj"):
-                # Parse PackageReference elements
-                package_pattern = r'<PackageReference\s+Include="([^"]+)"\s+Version="([^"]+)"\s*/>'
-                matches = re.finditer(package_pattern, content)
+                # Match PackageReference with optional Version (supports Central Package Management)
+                package_pattern = r'<PackageReference\s+Include="([^"]+)"(?:\s+Version="([^"]*)")?[^/]*/?>'
+                matches = re.finditer(package_pattern, content, re.IGNORECASE)
+                for match in matches:
+                    package_name = match.group(1)
+                    version = match.group(2) or ""  # empty when using CPM
+                    dep_node = f"Dependency: {package_name}"
+                    if not self.graph.has_node(dep_node):
+                        self.graph.add_node(dep_node, type="dependency", name=package_name, version=version, source_file=self._current_source_file)
+                    self.graph.add_edge(file_node, dep_node, relation="HAS_DEPENDENCY", source_file=self._current_source_file)
+
+                    self.total_dependencies.add(package_name)
+            elif os.path.basename(file_path) == "Directory.Packages.props":
+                # Central Package Management — versions are defined here as <PackageVersion>
+                package_pattern = r'<PackageVersion\s+Include="([^"]+)"\s+Version="([^"]+)"\s*/>'
+                matches = re.finditer(package_pattern, content, re.IGNORECASE)
                 for match in matches:
                     package_name = match.group(1)
                     version = match.group(2)
                     dep_node = f"Dependency: {package_name}"
-                    if not self.graph.has_node(dep_node):
-                        self.graph.add_node(dep_node, type="dependency", name=package_name, version=version)
-                    self.graph.add_edge(file_node, dep_node, relation="HAS_DEPENDENCY")
-
+                    if self.graph.has_node(dep_node):
+                        # Update version on existing stub node added from a csproj
+                        self.graph.nodes[dep_node]["version"] = version
+                    else:
+                        self.graph.add_node(dep_node, type="dependency", name=package_name, version=version, source_file=self._current_source_file)
+                    self.graph.add_edge(file_node, dep_node, relation="HAS_DEPENDENCY", source_file=self._current_source_file)
                     self.total_dependencies.add(package_name)
             elif file_path.endswith("packages.config"):
                 # Parse package elements
@@ -651,8 +691,8 @@ class CSCodeKnowledgeGraph:
                     version = match.group(2)
                     dep_node = f"Dependency: {package_name}"
                     if not self.graph.has_node(dep_node):
-                        self.graph.add_node(dep_node, type="dependency", name=package_name, version=version)
-                    self.graph.add_edge(file_node, dep_node, relation="HAS_DEPENDENCY")
+                        self.graph.add_node(dep_node, type="dependency", name=package_name, version=version, source_file=self._current_source_file)
+                    self.graph.add_edge(file_node, dep_node, relation="HAS_DEPENDENCY", source_file=self._current_source_file)
 
                     self.total_dependencies.add(package_name)
             elif file_path.endswith("packages.lock.json"):
@@ -662,8 +702,8 @@ class CSCodeKnowledgeGraph:
                     version = dep_info.get("resolved", "")
                     dep_node = f"Dependency: {dep_name}"
                     if not self.graph.has_node(dep_node):
-                        self.graph.add_node(dep_node, type="dependency", name=dep_name, version=version)
-                    self.graph.add_edge(file_node, dep_node, relation="HAS_LOCKED_DEPENDENCY")
+                        self.graph.add_node(dep_node, type="dependency", name=dep_name, version=version, source_file=self._current_source_file)
+                    self.graph.add_edge(file_node, dep_node, relation="HAS_LOCKED_DEPENDENCY", source_file=self._current_source_file)
 
                     self.total_dependencies.add(dep_name)
 

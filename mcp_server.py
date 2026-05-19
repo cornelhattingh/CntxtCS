@@ -51,7 +51,7 @@ def _run_analysis(directory: str, project: str) -> dict[str, Any]:
         "total_usings": ckg.total_usings,
     }
     with SurrealStorage(project) as storage:
-        storage.store_graph(ckg.graph, {"stats": stats})
+        storage.store_graph(ckg.graph, stats)
 
     print(
         f"[cntxtcs] Analysis complete: {stats['total_classes']} classes, "
@@ -60,6 +60,46 @@ def _run_analysis(directory: str, project: str) -> dict[str, Any]:
         flush=True,
     )
     return stats
+
+
+def _run_analysis_incremental(
+    directory: str,
+    project: str,
+    changed_paths: list[str],
+    deleted_paths: list[str],
+) -> None:
+    """Delete stale data for affected files then re-index only the changed ones.
+
+    Stats are not updated here; they remain from the last full analysis.
+    """
+    relative_all = [
+        os.path.relpath(p, directory)
+        for p in changed_paths + deleted_paths
+    ]
+
+    with SurrealStorage(project) as storage:
+        if relative_all:
+            storage.delete_file_data(relative_all)
+
+    if not changed_paths:
+        print(
+            f"[cntxtcs] Incremental: removed {len(deleted_paths)} file(s) from index.",
+            file=sys.stderr, flush=True,
+        )
+        return
+
+    from CntxtCS import CSCodeKnowledgeGraph
+    ckg = CSCodeKnowledgeGraph(directory=directory)
+    ckg.analyze_files(changed_paths)
+
+    with SurrealStorage(project) as storage:
+        storage.store_graph(ckg.graph, {}, update_stats=False)
+
+    print(
+        f"[cntxtcs] Incremental: re-indexed {len(changed_paths)} file(s), "
+        f"removed {len(deleted_paths)} file(s).",
+        file=sys.stderr, flush=True,
+    )
 
 
 # ── File watcher ───────────────────────────────────────────────────────────────
@@ -87,10 +127,17 @@ def _start_watcher(directory: str, project: str) -> None:
 
     _timer_ref: list[threading.Timer | None] = [None]
     _lock = threading.Lock()
+    _changed: set[str] = set()
+    _deleted: set[str] = set()
 
     def _debounced_trigger() -> None:
+        with _lock:
+            changed = list(_changed)
+            deleted = list(_deleted)
+            _changed.clear()
+            _deleted.clear()
         try:
-            _run_analysis(directory, project)
+            _run_analysis_incremental(directory, project, changed, deleted)
         except Exception as exc:
             print(f"[cntxtcs] Auto re-analysis error: {exc}", file=sys.stderr, flush=True)
 
@@ -102,6 +149,12 @@ def _start_watcher(directory: str, project: str) -> None:
             if not any(src.endswith(ext) for ext in _WATCHED_EXTENSIONS):
                 return
             with _lock:
+                if event.event_type == "deleted":
+                    _deleted.add(src)
+                    _changed.discard(src)
+                else:
+                    _changed.add(src)
+                    _deleted.discard(src)
                 if _timer_ref[0] is not None:
                     _timer_ref[0].cancel()
                 t = threading.Timer(_DEBOUNCE_SECONDS, _debounced_trigger)
@@ -426,12 +479,14 @@ def main() -> None:
     Without arguments: start the MCP server (tools query pre-existing SurrealDB data).
     With --directory + --project: analyse the codebase first, then start the server.
     With --watch: also watch for .cs file changes and auto re-analyse.
+    With --skip-scan: skip the initial full analysis (use existing SurrealDB data).
     
     Examples::
     
         uv run python mcp_server.py
         uv run python mcp_server.py --directory ./MyProject --project my-api
         uv run python mcp_server.py --directory ./MyProject --project my-api --watch
+        uv run python mcp_server.py --directory ./MyProject --project my-api --watch --skip-scan
     """
     import argparse
 
@@ -450,9 +505,30 @@ def main() -> None:
         help="SurrealDB project name (database). Required when --directory is used.",
     )
     parser.add_argument(
+        "--skip-scan",
+        action="store_true",
+        help=(
+            "Skip the initial full analysis on startup. The server connects to existing "
+            "SurrealDB data immediately. Use the Full Scan button in the UI (or the "
+            "reanalyze() MCP tool) to trigger a scan manually."
+        ),
+    )
+    parser.add_argument(
         "--watch", "-w",
         action="store_true",
         help="Watch the directory for .cs/.csproj changes and auto re-analyse. Requires --directory and --project.",
+    )
+    parser.add_argument(
+        "--ui",
+        action="store_true",
+        help="Also start the web UI server (React dashboard + REST API).",
+    )
+    parser.add_argument(
+        "--ui-port",
+        type=int,
+        default=8080,
+        metavar="PORT",
+        help="Port for the web UI server (default: 8080). Implies --ui.",
     )
     args = parser.parse_args()
 
@@ -467,15 +543,34 @@ def main() -> None:
 
     # Run initial analysis before binding the MCP transport
     if args.directory and args.project:
-        try:
-            _run_analysis(args.directory, args.project)
-        except Exception as exc:
-            print(f"[cntxtcs] Initial analysis failed: {exc}", file=sys.stderr, flush=True)
-            sys.exit(1)
+        if args.skip_scan:
+            print(
+                f"[cntxtcs] --skip-scan: using existing data for project '{args.project}'. "
+                "Use Full Scan in the UI or reanalyze() to index the codebase.",
+                file=sys.stderr, flush=True,
+            )
+        else:
+            try:
+                _run_analysis(args.directory, args.project)
+            except Exception as exc:
+                print(f"[cntxtcs] Initial analysis failed: {exc}", file=sys.stderr, flush=True)
+                sys.exit(1)
 
     # Start background file watcher
     if args.watch:
         _start_watcher(args.directory, args.project)  # type: ignore[arg-type]
+
+    # Start web UI server in a background thread when requested
+    if args.ui or args.ui_port != 8080:
+        from web_server import start_server_thread
+        from web_server import _web_config as _wc
+        _wc["directory"] = args.directory
+        start_server_thread(port=args.ui_port)
+        print(
+            f"[cntxtcs] Web UI available at http://localhost:{args.ui_port}",
+            file=sys.stderr,
+            flush=True,
+        )
 
     mcp.run()
 
