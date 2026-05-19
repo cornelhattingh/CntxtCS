@@ -34,7 +34,7 @@ describe('DashboardPage', () => {
 
     render(<DashboardPage />)
 
-    expect(screen.getByText('Select a project to get started')).toBeInTheDocument()
+    expect(screen.getByText('No project selected')).toBeInTheDocument()
   })
 
   it('shows error message when stats API fails', async () => {

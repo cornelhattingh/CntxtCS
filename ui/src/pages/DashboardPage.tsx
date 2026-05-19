@@ -17,6 +17,7 @@ import { StatCard } from '@/components/stats/StatCard'
 import { DependencyList } from '@/components/stats/DependencyList'
 import { Separator } from '@/components/ui/separator'
 import { Button } from '@/components/ui/button'
+import { EmptyState } from '@/components/common/EmptyState'
 
 export function DashboardPage() {
   const { selected } = useProject()
@@ -91,9 +92,11 @@ export function DashboardPage() {
 
   if (!selected) {
     return (
-      <div className="flex items-center justify-center h-full text-muted-foreground">
-        Select a project to get started
-      </div>
+      <EmptyState
+        heading="No project selected"
+        body="Run the MCP server with a project directory to index your codebase, then select the project from the header."
+        copyCommand="uv run python mcp_server.py --directory /path/to/project --project my-project"
+      />
     )
   }
 

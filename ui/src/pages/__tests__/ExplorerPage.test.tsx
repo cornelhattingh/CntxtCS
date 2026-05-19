@@ -34,7 +34,7 @@ describe('ExplorerPage', () => {
 
     render(<ExplorerPage />)
 
-    expect(screen.getByText('Select a project to explore')).toBeInTheDocument()
+    expect(screen.getByText('No project selected')).toBeInTheDocument()
   })
 
   it('shows error message when classes API fails', async () => {

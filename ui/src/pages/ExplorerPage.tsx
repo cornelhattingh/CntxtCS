@@ -6,6 +6,7 @@ import { ClassTable } from '@/components/explorer/ClassTable'
 import { InterfaceTable } from '@/components/explorer/InterfaceTable'
 import { NamespaceList } from '@/components/explorer/NamespaceList'
 import { FileTree } from '@/components/explorer/FileTree'
+import { EmptyState } from '@/components/common/EmptyState'
 
 export function ExplorerPage() {
   const { selected } = useProject()
@@ -41,9 +42,10 @@ export function ExplorerPage() {
 
   if (!selected) {
     return (
-      <div className="flex items-center justify-center h-full text-muted-foreground">
-        Select a project to explore
-      </div>
+      <EmptyState
+        heading="No project selected"
+        body="Select a project from the header to explore its classes, interfaces, and files."
+      />
     )
   }
 

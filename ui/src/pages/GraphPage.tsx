@@ -5,6 +5,7 @@ import { GraphCanvas } from '@/components/graph/GraphCanvas'
 import { NodeTypeFilter, NodeDetailPanelContent } from '@/components/graph/NodeTypeFilter'
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet'
 import { Skeleton } from '@/components/ui/skeleton'
+import { EmptyState } from '@/components/common/EmptyState'
 
 export function GraphPage() {
   const { selected } = useProject()
@@ -49,9 +50,10 @@ export function GraphPage() {
 
   if (!selected) {
     return (
-      <div className="flex items-center justify-center h-full text-muted-foreground">
-        Select a project to view the graph
-      </div>
+      <EmptyState
+        heading="No project selected"
+        body="Select a project from the header to visualise its dependency graph."
+      />
     )
   }
 
