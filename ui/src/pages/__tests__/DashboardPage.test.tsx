@@ -83,9 +83,9 @@ describe('DashboardPage', () => {
 
     render(<DashboardPage />)
 
-    // Wait for stat cards to render
+    // Wait for metric groups to render
     await waitFor(() => {
-      expect(screen.getByText('Source Files')).toBeInTheDocument()
+      expect(screen.getByText('Source files')).toBeInTheDocument()
       expect(screen.getByText('10')).toBeInTheDocument()
       expect(screen.getByText('Classes')).toBeInTheDocument()
       expect(screen.getByText('5')).toBeInTheDocument()

@@ -1,19 +1,8 @@
 import { useEffect, useState } from 'react'
-import {
-  FileCode2,
-  Layers,
-  FunctionSquare,
-  Braces,
-  Boxes,
-  ListOrdered,
-  Shapes,
-  Package2,
-  Import,
-  RefreshCw,
-} from 'lucide-react'
+import { RefreshCw } from 'lucide-react'
 import { api, type Stats, type Dependency } from '@/lib/api'
 import { useProject } from '@/lib/project-context'
-import { StatCard } from '@/components/stats/StatCard'
+import { MetricGroup } from '@/components/stats/MetricGroup'
 import { DependencyList } from '@/components/stats/DependencyList'
 import { Separator } from '@/components/ui/separator'
 import { Button } from '@/components/ui/button'
@@ -78,17 +67,7 @@ export function DashboardPage() {
     }
   }
 
-  const metrics: Array<{ title: string; key: keyof Stats; icon: React.ReactNode }> = [
-    { title: 'Source Files', key: 'total_files', icon: <FileCode2 className="h-4 w-4" /> },
-    { title: 'Classes', key: 'total_classes', icon: <Layers className="h-4 w-4" /> },
-    { title: 'Methods', key: 'total_methods', icon: <FunctionSquare className="h-4 w-4" /> },
-    { title: 'Interfaces', key: 'total_interfaces', icon: <Braces className="h-4 w-4" /> },
-    { title: 'Namespaces', key: 'total_namespaces', icon: <Boxes className="h-4 w-4" /> },
-    { title: 'Enums', key: 'total_enums', icon: <ListOrdered className="h-4 w-4" /> },
-    { title: 'Structs', key: 'total_structs', icon: <Shapes className="h-4 w-4" /> },
-    { title: 'Dependencies', key: 'total_dependencies', icon: <Package2 className="h-4 w-4" /> },
-    { title: 'Using Directives', key: 'total_usings', icon: <Import className="h-4 w-4" /> },
-  ]
+
 
   if (!selected) {
     return (
@@ -127,16 +106,40 @@ export function DashboardPage() {
         <p className="text-sm text-destructive">{fetchError}</p>
       )}
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-        {metrics.map(m => (
-          <StatCard
-            key={m.key}
-            title={m.title}
-            value={stats?.[m.key] as number}
-            icon={m.icon}
-            loading={loading}
-          />
-        ))}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <MetricGroup
+          title="Structure"
+          loading={loading}
+          metrics={[
+            { label: 'Source files', value: stats?.total_files },
+            { label: 'Namespaces', value: stats?.total_namespaces },
+          ]}
+        />
+        <MetricGroup
+          title="Types"
+          loading={loading}
+          metrics={[
+            { label: 'Classes', value: stats?.total_classes, primary: true },
+            { label: 'Interfaces', value: stats?.total_interfaces },
+            { label: 'Enums', value: stats?.total_enums },
+            { label: 'Structs', value: stats?.total_structs },
+          ]}
+        />
+        <MetricGroup
+          title="Members"
+          loading={loading}
+          metrics={[
+            { label: 'Methods', value: stats?.total_methods },
+          ]}
+        />
+        <MetricGroup
+          title="Dependencies"
+          loading={loading}
+          metrics={[
+            { label: 'NuGet packages', value: stats?.total_dependencies },
+            { label: 'Using directives', value: stats?.total_usings },
+          ]}
+        />
       </div>
 
       <Separator />
