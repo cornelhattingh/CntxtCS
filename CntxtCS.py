@@ -4,9 +4,11 @@ import os
 import re
 import sys
 import json
+import argparse
 import networkx as nx
 from networkx.readwrite import json_graph
 from typing import Dict, List, Optional, Any
+from surreal_storage import SurrealStorage
 
 
 class CSCodeKnowledgeGraph:
@@ -790,8 +792,12 @@ class CSCodeKnowledgeGraph:
         except ImportError:
             print("Matplotlib is required for visualization. Install it using 'pip install matplotlib'.")
 
-    def run(self):
+    def run(self, surreal: bool = False, project_name: str | None = None):
         """Run the analysis and save the graph."""
+        # Validate parameters before starting
+        if surreal and not project_name:
+            raise ValueError("--project is required when using --surreal")
+        
         try:
             # Analyze the codebase.
             print("\nAnalyzing codebase...")
@@ -825,6 +831,13 @@ class CSCodeKnowledgeGraph:
             for key, value in stats.items():
                 print(f"{key:<{max_len + 2}}: {value:,}")
 
+            # Optionally store to SurrealDB
+            if surreal:
+                print("\nStoring graph in SurrealDB...")
+                with SurrealStorage(project_name) as storage:
+                    storage.store_graph(self.graph, {"stats": stats})
+                print(f"Graph stored in SurrealDB project '{project_name}'")
+
             # Optional visualization.
             while True:
                 visualize = input("\nWould you like to visualize the graph? (yes/no): ").strip().lower()
@@ -844,19 +857,44 @@ class CSCodeKnowledgeGraph:
             print("\nDone.")
 
 
-if __name__ == "__main__":
+def main():
+    """Entry point for the cntxtcs CLI script."""
+    parser = argparse.ArgumentParser(
+        description="C# Code Knowledge Graph Generator"
+    )
+    parser.add_argument(
+        "directory",
+        nargs="?",
+        help="Path to the C# codebase directory (interactive prompt if omitted)",
+    )
+    parser.add_argument(
+        "--surreal",
+        action="store_true",
+        help="Store the knowledge graph in SurrealDB",
+    )
+    parser.add_argument(
+        "--project",
+        metavar="NAME",
+        help="Project name (SurrealDB database name). Required with --surreal",
+    )
+    args = parser.parse_args()
+
     try:
-        # Directory containing the C# codebase.
         print("C# Code Knowledge Graph Generator")
         print("--------------------------------")
-        codebase_dir = input("Enter the path to the codebase directory: ").strip()
+
+        codebase_dir = args.directory
+        if not codebase_dir:
+            codebase_dir = input("Enter the path to the codebase directory: ").strip()
 
         if not os.path.exists(codebase_dir):
             raise ValueError(f"Directory does not exist: {codebase_dir}")
 
-        # Create and analyze the codebase.
+        if args.surreal and not args.project:
+            parser.error("--project NAME is required when using --surreal")
+
         ckg = CSCodeKnowledgeGraph(directory=codebase_dir)
-        ckg.run()
+        ckg.run(surreal=args.surreal, project_name=args.project)
 
     except KeyboardInterrupt:
         print("\nOperation cancelled by user.")
@@ -864,3 +902,7 @@ if __name__ == "__main__":
         print(f"\nError: {str(e)}", file=sys.stderr)
     finally:
         print("\nDone.")
+
+
+if __name__ == "__main__":
+    main()

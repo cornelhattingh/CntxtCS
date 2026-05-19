@@ -1,0 +1,480 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - banner "Main navigation" [ref=e4]:
+      - generic [ref=e5]:
+        - generic [ref=e6]:
+          - link [ref=e7] [cursor=pointer]:
+            - /url: /
+            - img [ref=e8]
+          - separator [ref=e9]
+          - link "SurrealDB Docs home" [ref=e10] [cursor=pointer]:
+            - /url: /docs/
+            - img [ref=e11]
+        - generic [ref=e12]:
+          - button "Toggle color scheme" [ref=e13] [cursor=pointer]
+          - link "Sign In" [ref=e16] [cursor=pointer]:
+            - /url: https://app.surrealdb.com/signin?_gl=1*6c6cw1*FPAU*MjUyNzg4NDQ3LjE3NzA3MzU0OTI.*_ga*MTUwNTkxNTcyNS4xNzcwNzM1NDky*_ga_J1NWM32T1V*czE3NzE4NDcxMTMkbzQ2JGcxJHQxNzcxODQ3MjAwJGo1NiRsMCRoNjUwODcxODU5*_fplc*dEpHdFVZdTN2eEolMkJBWkNUY1R5NUhKbmJySSUyRk56eEN6ZHlEcU52cTJzbUV0dXpOcmZhSU5MeXZFdW90bFdPZWRpbE4yTzA1dmZ1MiUyRlc5RnM3djhEZ2NVeGZhdmoyNW1rcFFsSmhwUXJzR1BoR2ZIWUdsMXYyZ0tJSXFmOW93JTNEJTNE
+            - generic [ref=e18]: Sign In
+          - button "Toggle navigation" [ref=e19] [cursor=pointer]
+    - generic [ref=e24]:
+      - generic [ref=e25]:
+        - button "Toggle sidebar" [ref=e26] [cursor=pointer]
+        - generic [ref=e30]:
+          - paragraph [ref=e31]: Languages
+          - paragraph [ref=e33]: /
+          - paragraph [ref=e34]: Python
+          - paragraph [ref=e36]: /
+          - paragraph [ref=e37]: Concepts
+      - generic [ref=e38]:
+        - heading "Data manipulation" [level=1] [ref=e39]
+        - button "Copy page" [ref=e40] [cursor=pointer]:
+          - generic [ref=e44]: Copy page
+      - paragraph [ref=e47]: The Python SDK provides methods for selecting, creating, updating, and deleting records in SurrealDB.
+      - main [ref=e48]:
+        - generic [ref=e50]:
+          - paragraph [ref=e51]: The Python SDK provides dedicated methods for common CRUD operations on records and tables. These methods offer a structured alternative to writing raw SurrealQL, with built-in parameter handling and type safety.
+          - paragraph [ref=e52]: This page covers how to target tables and records, and how to select, create, insert, update, merge, patch, and delete data.
+          - heading "API references" [level=2] [ref=e53]:
+            - text: API references
+            - link [ref=e54] [cursor=pointer]:
+              - /url: "#api-references"
+          - table [ref=e56]:
+            - rowgroup [ref=e57]:
+              - row "Method Description" [ref=e58]:
+                - columnheader "Method" [ref=e59]
+                - columnheader "Description" [ref=e60]
+            - rowgroup [ref=e61]:
+              - row "db.select(record) Selects all records from a table, or a specific record" [ref=e62]:
+                - cell "db.select(record)" [ref=e63]:
+                  - link "db.select(record)" [ref=e64] [cursor=pointer]:
+                    - /url: /docs/languages/python/api/core/surreal#select
+                    - code [ref=e65]: db.select(record)
+                - cell "Selects all records from a table, or a specific record" [ref=e66]
+              - row "db.create(record, data?) Creates a new record with an optional data payload" [ref=e67]:
+                - cell "db.create(record, data?)" [ref=e68]:
+                  - link "db.create(record, data?)" [ref=e69] [cursor=pointer]:
+                    - /url: /docs/languages/python/api/core/surreal#create
+                    - code [ref=e70]: db.create(record, data?)
+                - cell "Creates a new record with an optional data payload" [ref=e71]
+              - row "db.insert(table, data) Inserts one or multiple records into a table" [ref=e72]:
+                - cell "db.insert(table, data)" [ref=e73]:
+                  - link "db.insert(table, data)" [ref=e74] [cursor=pointer]:
+                    - /url: /docs/languages/python/api/core/surreal#insert
+                    - code [ref=e75]: db.insert(table, data)
+                - cell "Inserts one or multiple records into a table" [ref=e76]
+              - row "db.insert_relation(table, data) Inserts one or multiple relation records" [ref=e77]:
+                - cell "db.insert_relation(table, data)" [ref=e78]:
+                  - link "db.insert_relation(table, data)" [ref=e79] [cursor=pointer]:
+                    - /url: /docs/languages/python/api/core/surreal#insert-relation
+                    - code [ref=e80]: db.insert_relation(table, data)
+                - cell "Inserts one or multiple relation records" [ref=e81]
+              - row "db.update(record, data?) Replaces the entire content of a record or all records in a table" [ref=e82]:
+                - cell "db.update(record, data?)" [ref=e83]:
+                  - link "db.update(record, data?)" [ref=e84] [cursor=pointer]:
+                    - /url: /docs/languages/python/api/core/surreal#update
+                    - code [ref=e85]: db.update(record, data?)
+                - cell "Replaces the entire content of a record or all records in a table" [ref=e86]
+              - row "db.upsert(record, data?) Creates a record if it does not exist, or replaces it entirely" [ref=e87]:
+                - cell "db.upsert(record, data?)" [ref=e88]:
+                  - link "db.upsert(record, data?)" [ref=e89] [cursor=pointer]:
+                    - /url: /docs/languages/python/api/core/surreal#upsert
+                    - code [ref=e90]: db.upsert(record, data?)
+                - cell "Creates a record if it does not exist, or replaces it entirely" [ref=e91]
+              - row "db.merge(record, data?) Merges data into an existing record, preserving unmentioned fields" [ref=e92]:
+                - cell "db.merge(record, data?)" [ref=e93]:
+                  - link "db.merge(record, data?)" [ref=e94] [cursor=pointer]:
+                    - /url: /docs/languages/python/api/core/surreal#merge
+                    - code [ref=e95]: db.merge(record, data?)
+                - cell "Merges data into an existing record, preserving unmentioned fields" [ref=e96]
+              - row "db.patch(record, data?) Applies JSON Patch operations to a record or all records in a table" [ref=e97]:
+                - cell "db.patch(record, data?)" [ref=e98]:
+                  - link "db.patch(record, data?)" [ref=e99] [cursor=pointer]:
+                    - /url: /docs/languages/python/api/core/surreal#patch
+                    - code [ref=e100]: db.patch(record, data?)
+                - cell "Applies JSON Patch operations to a record or all records in a table" [ref=e101]
+              - row "db.delete(record) Deletes a specific record or all records from a table" [ref=e102]:
+                - cell "db.delete(record)" [ref=e103]:
+                  - link "db.delete(record)" [ref=e104] [cursor=pointer]:
+                    - /url: /docs/languages/python/api/core/surreal#delete
+                    - code [ref=e105]: db.delete(record)
+                - cell "Deletes a specific record or all records from a table" [ref=e106]
+          - heading "Targeting tables and records" [level=2] [ref=e107]:
+            - text: Targeting tables and records
+            - link [ref=e108] [cursor=pointer]:
+              - /url: "#targeting-tables-and-records"
+          - paragraph [ref=e110]:
+            - text: Most data manipulation methods accept a
+            - code [ref=e111]: record
+            - text: parameter that determines the scope of the operation. You can pass a table name as a string to target all records in that table, or a
+            - link "RecordID" [ref=e112] [cursor=pointer]:
+              - /url: /docs/languages/python/api/values/record-id
+            - text: to target a specific record.
+          - generic [ref=e114]:
+            - generic [ref=e115]:
+              - text: from surrealdb import RecordID
+              - text: db.select("users")
+              - text: db.select(RecordID("users", "tobie"))
+            - button "Copy code" [ref=e116] [cursor=pointer]
+          - paragraph [ref=e119]:
+            - text: When a string is passed, the operation applies to the entire table. When a
+            - code [ref=e120]: RecordID
+            - text: is passed, it applies to the single record identified by that ID. See the
+            - link "RecordID reference" [ref=e121] [cursor=pointer]:
+              - /url: /docs/languages/python/api/values/record-id
+            - text: for more on constructing record identifiers.
+          - heading "Selecting records" [level=2] [ref=e122]:
+            - text: Selecting records
+            - link [ref=e123] [cursor=pointer]:
+              - /url: "#selecting-records"
+          - paragraph [ref=e125]:
+            - text: The
+            - code [ref=e126]: .select()
+            - text: method retrieves records from the database. Pass a table name to get all records, or a
+            - code [ref=e127]: RecordID
+            - text: to get a single record.
+          - generic [ref=e128]:
+            - tablist [ref=e129]:
+              - tab "Synchronous" [selected] [ref=e130] [cursor=pointer]:
+                - generic [ref=e131]: Synchronous
+              - tab "Asynchronous" [ref=e132] [cursor=pointer]:
+                - generic [ref=e133]: Asynchronous
+            - tabpanel "Synchronous" [ref=e134]:
+              - generic [ref=e136]:
+                - generic [ref=e137]:
+                  - text: from surrealdb import Surreal, RecordID
+                  - text: "with Surreal(\"ws://localhost:8000\") as db:"
+                  - text: db.use("surrealdb", "docs")
+                  - text: "db.signin({\"username\": \"root\", \"password\": \"root\"})"
+                  - text: all_users = db.select("users")
+                  - text: tobie = db.select(RecordID("users", "tobie"))
+                - button "Copy code" [ref=e138] [cursor=pointer]
+          - paragraph [ref=e141]:
+            - text: When selecting a table, the method returns a list. When selecting a specific record, it returns a single value or
+            - code [ref=e142]: None
+            - text: if the record does not exist.
+          - heading "Creating records" [level=2] [ref=e143]:
+            - text: Creating records
+            - link [ref=e144] [cursor=pointer]:
+              - /url: "#creating-records"
+          - paragraph [ref=e146]:
+            - text: The
+            - code [ref=e147]: .create()
+            - text: method creates a new record. Pass a table name to generate a random ID, or a
+            - code [ref=e148]: RecordID
+            - text: to specify the ID explicitly.
+          - generic [ref=e149]:
+            - tablist [ref=e150]:
+              - tab "Synchronous" [selected] [ref=e151] [cursor=pointer]:
+                - generic [ref=e152]: Synchronous
+              - tab "Asynchronous" [ref=e153] [cursor=pointer]:
+                - generic [ref=e154]: Asynchronous
+            - tabpanel "Synchronous" [ref=e155]:
+              - generic [ref=e157]:
+                - generic [ref=e158]:
+                  - text: from surrealdb import RecordID
+                  - text: "user = db.create(\"users\", {"
+                  - text: "\"name\": \"Alice\","
+                  - text: "\"email\": \"alice@example.com\","
+                  - text: "\"age\": 30,"
+                  - text: "})"
+                  - text: "specific = db.create(RecordID(\"users\", \"tobie\"), {"
+                  - text: "\"name\": \"Tobie\","
+                  - text: "\"email\": \"tobie@surrealdb.com\","
+                  - text: "\"age\": 35,"
+                  - text: "})"
+                - button "Copy code" [ref=e159] [cursor=pointer]
+          - paragraph [ref=e162]:
+            - text: The method returns the created record, including any server-generated fields such as the
+            - code [ref=e163]: id
+            - text: .
+          - heading "Inserting records" [level=2] [ref=e164]:
+            - text: Inserting records
+            - link [ref=e165] [cursor=pointer]:
+              - /url: "#inserting-records"
+          - paragraph [ref=e167]:
+            - text: The
+            - code [ref=e168]: .insert()
+            - text: method inserts one or more records into a table. This is useful for bulk operations where you need to add multiple records at once.
+          - generic [ref=e169]:
+            - tablist [ref=e170]:
+              - tab "Synchronous" [selected] [ref=e171] [cursor=pointer]:
+                - generic [ref=e172]: Synchronous
+              - tab "Asynchronous" [ref=e173] [cursor=pointer]:
+                - generic [ref=e174]: Asynchronous
+            - tabpanel "Synchronous" [ref=e175]:
+              - generic [ref=e177]:
+                - generic [ref=e178]:
+                  - text: "db.insert(\"users\", {\"name\": \"Alice\", \"age\": 30})"
+                  - text: db.insert("users", [
+                  - text: "{\"name\": \"Bob\", \"age\": 25},"
+                  - text: "{\"name\": \"Charlie\", \"age\": 40},"
+                  - text: "])"
+                - button "Copy code" [ref=e179] [cursor=pointer]
+          - paragraph [ref=e182]:
+            - text: The
+            - code [ref=e183]: .insert_relation()
+            - text: method works the same way but is designed for creating graph edges between records. Each record must include
+            - code [ref=e184]: in
+            - text: and
+            - code [ref=e185]: out
+            - text: fields pointing to the connected records.
+          - generic [ref=e186]:
+            - tablist [ref=e187]:
+              - tab "Synchronous" [selected] [ref=e188] [cursor=pointer]:
+                - generic [ref=e189]: Synchronous
+              - tab "Asynchronous" [ref=e190] [cursor=pointer]:
+                - generic [ref=e191]: Asynchronous
+            - tabpanel "Synchronous" [ref=e192]:
+              - generic [ref=e194]:
+                - generic [ref=e195]:
+                  - text: from surrealdb import RecordID
+                  - text: "db.insert_relation(\"likes\", {"
+                  - text: "\"in\": RecordID(\"users\", \"tobie\"),"
+                  - text: "\"out\": RecordID(\"posts\", 123),"
+                  - text: "})"
+                  - text: db.insert_relation("likes", [
+                  - text: "{\"in\": RecordID(\"users\", \"tobie\"), \"out\": RecordID(\"posts\", 123)},"
+                  - text: "{\"in\": RecordID(\"users\", \"jaime\"), \"out\": RecordID(\"posts\", 456)},"
+                  - text: "])"
+                - button "Copy code" [ref=e196] [cursor=pointer]
+          - heading "Replacing records" [level=2] [ref=e199]:
+            - text: Replacing records
+            - link [ref=e200] [cursor=pointer]:
+              - /url: "#replacing-records"
+          - paragraph [ref=e202]:
+            - text: The
+            - code [ref=e203]: .update()
+            - text: method replaces the entire content of a record or all records in a table. Any fields not included in the new data are removed.
+          - generic [ref=e204]:
+            - tablist [ref=e205]:
+              - tab "Synchronous" [selected] [ref=e206] [cursor=pointer]:
+                - generic [ref=e207]: Synchronous
+              - tab "Asynchronous" [ref=e208] [cursor=pointer]:
+                - generic [ref=e209]: Asynchronous
+            - tabpanel "Synchronous" [ref=e210]:
+              - generic [ref=e212]:
+                - generic [ref=e213]:
+                  - text: from surrealdb import RecordID
+                  - text: "db.update(RecordID(\"users\", \"tobie\"), {"
+                  - text: "\"name\": \"Tobie\","
+                  - text: "\"email\": \"tobie@surrealdb.com\","
+                  - text: "\"active\": True,"
+                  - text: "})"
+                  - text: "db.update(\"users\", {\"active\": False})"
+                - button "Copy code" [ref=e214] [cursor=pointer]
+          - alert "Note" [ref=e217]:
+            - generic [ref=e219]:
+              - heading "Note" [level=6] [ref=e224]
+              - paragraph [ref=e226]:
+                - text: Because
+                - code [ref=e227]: .update()
+                - text: performs a full replacement, omitted fields are deleted from the record. Use
+                - code [ref=e228]: .merge()
+                - text: if you want to preserve existing fields.
+          - heading "Upserting records" [level=2] [ref=e229]:
+            - text: Upserting records
+            - link [ref=e230] [cursor=pointer]:
+              - /url: "#upserting-records"
+          - paragraph [ref=e232]:
+            - text: The
+            - code [ref=e233]: .upsert()
+            - text: method creates a record if it does not already exist, or replaces it entirely if it does. This combines the behavior of
+            - code [ref=e234]: .create()
+            - text: and
+            - code [ref=e235]: .update()
+            - text: in a single operation.
+          - generic [ref=e236]:
+            - tablist [ref=e237]:
+              - tab "Synchronous" [selected] [ref=e238] [cursor=pointer]:
+                - generic [ref=e239]: Synchronous
+              - tab "Asynchronous" [ref=e240] [cursor=pointer]:
+                - generic [ref=e241]: Asynchronous
+            - tabpanel "Synchronous" [ref=e242]:
+              - generic [ref=e244]:
+                - generic [ref=e245]:
+                  - text: from surrealdb import RecordID
+                  - text: "db.upsert(RecordID(\"users\", \"tobie\"), {"
+                  - text: "\"name\": \"Tobie\","
+                  - text: "\"email\": \"tobie@surrealdb.com\","
+                  - text: "\"active\": True,"
+                  - text: "})"
+                - button "Copy code" [ref=e246] [cursor=pointer]
+          - heading "Merging data" [level=2] [ref=e249]:
+            - text: Merging data
+            - link [ref=e250] [cursor=pointer]:
+              - /url: "#merging-data"
+          - paragraph [ref=e252]:
+            - text: The
+            - code [ref=e253]: .merge()
+            - text: method deep-merges the provided data into the existing record, preserving any fields that are not mentioned in the merge payload. This is useful for partial updates.
+          - generic [ref=e254]:
+            - tablist [ref=e255]:
+              - tab "Synchronous" [selected] [ref=e256] [cursor=pointer]:
+                - generic [ref=e257]: Synchronous
+              - tab "Asynchronous" [ref=e258] [cursor=pointer]:
+                - generic [ref=e259]: Asynchronous
+            - tabpanel "Synchronous" [ref=e260]:
+              - generic [ref=e262]:
+                - generic [ref=e263]:
+                  - text: from surrealdb import RecordID
+                  - text: "db.merge(RecordID(\"users\", \"tobie\"), {"
+                  - text: "\"settings\": {\"active\": True},"
+                  - text: "})"
+                  - text: "db.merge(\"users\", {"
+                  - text: "\"updated_at\": \"2026-02-25T12:00:00Z\","
+                  - text: "})"
+                - button "Copy code" [ref=e264] [cursor=pointer]
+          - paragraph [ref=e267]:
+            - text: In the example above, only the
+            - code [ref=e268]: settings.active
+            - text: field is changed on the specific record. All other fields on the record remain untouched.
+          - heading "Applying patches" [level=2] [ref=e269]:
+            - text: Applying patches
+            - link [ref=e270] [cursor=pointer]:
+              - /url: "#applying-patches"
+          - paragraph [ref=e272]:
+            - text: The
+            - code [ref=e273]: .patch()
+            - text: method applies
+            - link "JSON Patch (RFC 6902)" [ref=e274] [cursor=pointer]:
+              - /url: https://jsonpatch.com/
+            - text: operations to a record or all records in a table. Each operation is a dictionary with
+            - code [ref=e275]: op
+            - text: ","
+            - code [ref=e276]: path
+            - text: ", and optionally"
+            - code [ref=e277]: value
+            - text: fields.
+          - generic [ref=e278]:
+            - tablist [ref=e279]:
+              - tab "Synchronous" [selected] [ref=e280] [cursor=pointer]:
+                - generic [ref=e281]: Synchronous
+              - tab "Asynchronous" [ref=e282] [cursor=pointer]:
+                - generic [ref=e283]: Asynchronous
+            - tabpanel "Synchronous" [ref=e284]:
+              - generic [ref=e286]:
+                - generic [ref=e287]:
+                  - text: from surrealdb import RecordID
+                  - text: db.patch(RecordID("users", "tobie"), [
+                  - text: "{\"op\": \"replace\", \"path\": \"/settings/active\", \"value\": False},"
+                  - text: "{\"op\": \"add\", \"path\": \"/tags\", \"value\": [\"developer\", \"admin\"]},"
+                  - text: "{\"op\": \"remove\", \"path\": \"/temp\"},"
+                  - text: "])"
+                - button "Copy code" [ref=e288] [cursor=pointer]
+          - paragraph [ref=e291]:
+            - text: Supported operations include
+            - code [ref=e292]: add
+            - text: ","
+            - code [ref=e293]: remove
+            - text: ","
+            - code [ref=e294]: replace
+            - text: ","
+            - code [ref=e295]: move
+            - text: ","
+            - code [ref=e296]: copy
+            - text: ", and"
+            - code [ref=e297]: test
+            - text: .
+          - heading "Deleting records" [level=2] [ref=e298]:
+            - text: Deleting records
+            - link [ref=e299] [cursor=pointer]:
+              - /url: "#deleting-records"
+          - paragraph [ref=e301]:
+            - text: The
+            - code [ref=e302]: .delete()
+            - text: method removes a specific record or all records from a table. The method returns the deleted record(s).
+          - generic [ref=e303]:
+            - tablist [ref=e304]:
+              - tab "Synchronous" [selected] [ref=e305] [cursor=pointer]:
+                - generic [ref=e306]: Synchronous
+              - tab "Asynchronous" [ref=e307] [cursor=pointer]:
+                - generic [ref=e308]: Asynchronous
+            - tabpanel "Synchronous" [ref=e309]:
+              - generic [ref=e311]:
+                - generic [ref=e312]:
+                  - text: from surrealdb import RecordID
+                  - text: deleted = db.delete(RecordID("users", "tobie"))
+                  - text: all_deleted = db.delete("users")
+                - button "Copy code" [ref=e313] [cursor=pointer]
+          - heading "Learn more" [level=2] [ref=e316]:
+            - text: Learn more
+            - link [ref=e317] [cursor=pointer]:
+              - /url: "#learn-more"
+          - list [ref=e319]:
+            - listitem [ref=e320]:
+              - paragraph [ref=e323]:
+                - link "Surreal API reference" [ref=e324] [cursor=pointer]:
+                  - /url: /docs/languages/python/api/core/surreal
+                - text: for complete method signatures and parameters
+            - listitem [ref=e325]:
+              - paragraph [ref=e328]:
+                - link "Executing queries" [ref=e329] [cursor=pointer]:
+                  - /url: /docs/languages/python/concepts/executing-queries
+                - text: for running SurrealQL statements directly
+            - listitem [ref=e330]:
+              - paragraph [ref=e333]:
+                - link "Value types" [ref=e334] [cursor=pointer]:
+                  - /url: /docs/languages/python/api/types
+                - text: for the types used by data manipulation methods
+            - listitem [ref=e335]:
+              - paragraph [ref=e338]:
+                - link "RecordID reference" [ref=e339] [cursor=pointer]:
+                  - /url: /docs/languages/python/api/values/record-id
+                - text: for constructing record identifiers
+            - listitem [ref=e340]:
+              - paragraph [ref=e343]:
+                - link "SurrealQL CRUD statements" [ref=e344] [cursor=pointer]:
+                  - /url: /docs/reference/query-language/statements/overview
+                - text: for the underlying query language
+      - separator [ref=e345]
+      - generic [ref=e346]:
+        - generic [ref=e347]:
+          - paragraph [ref=e348]: Was this page helpful?
+          - generic [ref=e349]:
+            - button "Yes" [ref=e350] [cursor=pointer]:
+              - generic [ref=e354]: "Yes"
+            - button "No" [ref=e355] [cursor=pointer]:
+              - generic [ref=e359]: "No"
+        - link "Edit page" [ref=e360] [cursor=pointer]:
+          - /url: https://github.com/surrealdb/docs.surrealdb.com/edit/main/src/content/index/languages/python/concepts/data-manipulation.mdx
+          - button "Edit page" [ref=e361]:
+            - generic [ref=e365]: Edit page
+        - link "Report an issue" [ref=e366] [cursor=pointer]:
+          - /url: https://github.com/surrealdb/docs.surrealdb.com/issues/new
+          - button "Report an issue" [ref=e367]:
+            - generic [ref=e371]: Report an issue
+      - generic [ref=e372]:
+        - link "Previous Executing queries" [ref=e373] [cursor=pointer]:
+          - /url: /docs/languages/python/concepts/executing-queries
+          - generic [ref=e376]:
+            - paragraph [ref=e377]: Previous
+            - paragraph [ref=e378]: Executing queries
+        - link "Next Value types" [ref=e379] [cursor=pointer]:
+          - /url: /docs/languages/python/concepts/value-types
+          - generic [ref=e381]:
+            - paragraph [ref=e382]: Next
+            - paragraph [ref=e383]: Value types
+      - contentinfo [ref=e385]:
+        - generic [ref=e386]:
+          - link "© SurrealDB 2026" [ref=e387] [cursor=pointer]:
+            - /url: https://github.com/surrealdb
+          - generic [ref=e388]: "|"
+          - navigation "SurrealDB footer links" [ref=e389]:
+            - link "Contributing" [ref=e390] [cursor=pointer]:
+              - /url: https://github.com/surrealdb/docs.surrealdb.com/blob/main/README.md#contributing-to-the-documentation
+            - link "Open Source" [ref=e391] [cursor=pointer]:
+              - /url: /opensource
+          - generic [ref=e392]:
+            - link "YouTube" [ref=e393] [cursor=pointer]:
+              - /url: https://www.youtube.com/@surrealdb
+            - link "Twitter" [ref=e396] [cursor=pointer]:
+              - /url: https://x.com/surrealdb
+            - link "Github" [ref=e399] [cursor=pointer]:
+              - /url: https://github.com/surrealdb
+            - link "Discord" [ref=e402] [cursor=pointer]:
+              - /url: https://discord.gg/surrealdb
+            - link "Bluesky" [ref=e405] [cursor=pointer]:
+              - /url: https://bsky.app/profile/surrealdb.com
+  - generic:
+    - generic:
+      - generic "Page feedback"

@@ -1,0 +1,302 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - banner "Main navigation" [ref=e4]:
+      - generic [ref=e5]:
+        - generic [ref=e6]:
+          - link [ref=e7] [cursor=pointer]:
+            - /url: /
+            - img [ref=e8]
+          - separator [ref=e9]
+          - link "SurrealDB Docs home" [ref=e10] [cursor=pointer]:
+            - /url: /docs/
+            - img [ref=e11]
+        - generic [ref=e12]:
+          - button "Toggle color scheme" [ref=e13] [cursor=pointer]
+          - link "Sign In" [ref=e16] [cursor=pointer]:
+            - /url: https://app.surrealdb.com/signin?_gl=1*6c6cw1*FPAU*MjUyNzg4NDQ3LjE3NzA3MzU0OTI.*_ga*MTUwNTkxNTcyNS4xNzcwNzM1NDky*_ga_J1NWM32T1V*czE3NzE4NDcxMTMkbzQ2JGcxJHQxNzcxODQ3MjAwJGo1NiRsMCRoNjUwODcxODU5*_fplc*dEpHdFVZdTN2eEolMkJBWkNUY1R5NUhKbmJySSUyRk56eEN6ZHlEcU52cTJzbUV0dXpOcmZhSU5MeXZFdW90bFdPZWRpbE4yTzA1dmZ1MiUyRlc5RnM3djhEZ2NVeGZhdmoyNW1rcFFsSmhwUXJzR1BoR2ZIWUdsMXYyZ0tJSXFmOW93JTNEJTNE
+            - generic [ref=e18]: Sign In
+          - button "Toggle navigation" [ref=e19] [cursor=pointer]
+    - generic [ref=e24]:
+      - generic [ref=e25]:
+        - button "Toggle sidebar" [ref=e26] [cursor=pointer]
+        - generic [ref=e30]:
+          - paragraph [ref=e31]: Languages
+          - paragraph [ref=e33]: /
+          - paragraph [ref=e34]: Python
+      - generic [ref=e35]:
+        - heading "Quickstart" [level=1] [ref=e36]
+        - button "Copy page" [ref=e37] [cursor=pointer]:
+          - generic [ref=e41]: Copy page
+      - paragraph [ref=e44]: Get started with the SurrealDB SDK for Python in minutes.
+      - main [ref=e45]:
+        - generic [ref=e47]:
+          - paragraph [ref=e48]: The Python SDK for SurrealDB makes it straightforward to connect to your instance and start querying data. This guide walks you through connecting, authenticating, and performing basic operations.
+          - heading "1. Install the SDK" [level=2] [ref=e49]:
+            - text: 1. Install the SDK
+            - link [ref=e50] [cursor=pointer]:
+              - /url: "#1-install-the-sdk"
+          - paragraph [ref=e52]:
+            - text: Follow the
+            - link "installation guide" [ref=e53] [cursor=pointer]:
+              - /url: /docs/languages/python/installation
+            - text: to install the SDK as a dependency in your project. Once installed, import the SDK to start using it.
+          - generic [ref=e54]:
+            - tablist [ref=e55]:
+              - tab "Synchronous" [selected] [ref=e56] [cursor=pointer]:
+                - generic [ref=e57]: Synchronous
+              - tab "Asynchronous" [ref=e58] [cursor=pointer]:
+                - generic [ref=e59]: Asynchronous
+            - tabpanel "Synchronous" [ref=e60]:
+              - generic [ref=e62]:
+                - generic [ref=e63]:
+                  - text: from surrealdb import Surreal
+                  - text: db = Surreal("ws://localhost:8000")
+                - button "Copy code" [ref=e64] [cursor=pointer]
+          - paragraph [ref=e67]:
+            - text: The
+            - code [ref=e68]: Surreal
+            - text: and
+            - code [ref=e69]: AsyncSurreal
+            - text: factory functions accept a connection URL and return the appropriate connection class based on the protocol.
+          - heading "2. Connect to SurrealDB" [level=2] [ref=e70]:
+            - text: 2. Connect to SurrealDB
+            - link [ref=e71] [cursor=pointer]:
+              - /url: "#2-connect-to-surrealdb"
+          - paragraph [ref=e73]:
+            - text: You can use the
+            - code [ref=e74]: .connect()
+            - text: method to open the connection, then
+            - code [ref=e75]: .use()
+            - text: to select a namespace and database, and
+            - code [ref=e76]: .signin()
+            - text: to authenticate.
+          - paragraph [ref=e77]: "Supported connection protocols include:"
+          - list [ref=e78]:
+            - listitem [ref=e79]:
+              - paragraph [ref=e82]:
+                - strong [ref=e83]: WebSocket
+                - text: (
+                - code [ref=e84]: ws://
+                - text: ","
+                - code [ref=e85]: wss://
+                - text: ) for long-lived stateful connections
+            - listitem [ref=e86]:
+              - paragraph [ref=e89]:
+                - strong [ref=e90]: HTTP
+                - text: (
+                - code [ref=e91]: http://
+                - text: ","
+                - code [ref=e92]: https://
+                - text: ) for short-lived stateless connections
+            - listitem [ref=e93]:
+              - paragraph [ref=e96]:
+                - strong [ref=e97]: Embedded
+                - text: (
+                - code [ref=e98]: mem://
+                - text: ","
+                - code [ref=e99]: file://
+                - text: ","
+                - code [ref=e100]: surrealkv://
+                - text: ) for in-process databases
+          - generic [ref=e101]:
+            - tablist [ref=e102]:
+              - tab "Synchronous" [selected] [ref=e103] [cursor=pointer]:
+                - generic [ref=e104]: Synchronous
+              - tab "Asynchronous" [ref=e105] [cursor=pointer]:
+                - generic [ref=e106]: Asynchronous
+            - tabpanel "Synchronous" [ref=e107]:
+              - generic [ref=e109]:
+                - generic [ref=e110]:
+                  - text: from surrealdb import Surreal
+                  - text: db = Surreal("ws://localhost:8000")
+                  - text: db.connect()
+                  - text: db.use("company_name", "project_name")
+                  - text: "db.signin({\"username\": \"root\", \"password\": \"root\"})"
+                - button "Copy code" [ref=e111] [cursor=pointer]
+          - paragraph [ref=e114]: You can also use a context manager to automatically close the connection when you are done.
+          - generic [ref=e115]:
+            - tablist [ref=e116]:
+              - tab "Synchronous" [selected] [ref=e117] [cursor=pointer]:
+                - generic [ref=e118]: Synchronous
+              - tab "Asynchronous" [ref=e119] [cursor=pointer]:
+                - generic [ref=e120]: Asynchronous
+            - tabpanel "Synchronous" [ref=e121]:
+              - generic [ref=e123]:
+                - generic [ref=e124]:
+                  - text: "with Surreal(\"ws://localhost:8000\") as db:"
+                  - text: db.use("company_name", "project_name")
+                  - text: "db.signin({\"username\": \"root\", \"password\": \"root\"})"
+                - button "Copy code" [ref=e125] [cursor=pointer]
+          - heading "3. Inserting data into SurrealDB" [level=2] [ref=e128]:
+            - text: 3. Inserting data into SurrealDB
+            - link [ref=e129] [cursor=pointer]:
+              - /url: "#3-inserting-data-into-surrealdb"
+          - paragraph [ref=e131]:
+            - text: Once connected, you can use the
+            - code [ref=e132]: .create()
+            - text: method to create records. Pass a table name or a
+            - code [ref=e133]: RecordID
+            - text: as the first argument and the record data as the second.
+          - generic [ref=e134]:
+            - tablist [ref=e135]:
+              - tab "Synchronous" [selected] [ref=e136] [cursor=pointer]:
+                - generic [ref=e137]: Synchronous
+              - tab "Asynchronous" [ref=e138] [cursor=pointer]:
+                - generic [ref=e139]: Asynchronous
+            - tabpanel "Synchronous" [ref=e140]:
+              - generic [ref=e142]:
+                - generic [ref=e143]:
+                  - text: from surrealdb import RecordID
+                  - text: "user = db.create(\"users\", {"
+                  - text: "\"name\": \"John\","
+                  - text: "\"email\": \"john@example.com\","
+                  - text: "\"age\": 32,"
+                  - text: "})"
+                  - text: "product = db.create(RecordID(\"products\", \"apple\"), {"
+                  - text: "\"name\": \"Apple\","
+                  - text: "\"price\": 1.50,"
+                  - text: "\"category\": \"fruit\","
+                  - text: "})"
+                - button "Copy code" [ref=e144] [cursor=pointer]
+          - heading "4. Retrieving data from SurrealDB" [level=2] [ref=e147]:
+            - text: 4. Retrieving data from SurrealDB
+            - link [ref=e148] [cursor=pointer]:
+              - /url: "#4-retrieving-data-from-surrealdb"
+          - heading "Selecting records" [level=3] [ref=e150]:
+            - text: Selecting records
+            - link [ref=e151] [cursor=pointer]:
+              - /url: "#selecting-records"
+          - paragraph [ref=e153]:
+            - text: The
+            - code [ref=e154]: .select()
+            - text: method retrieves all records from a table, or a single record by its
+            - code [ref=e155]: RecordID
+            - text: .
+          - generic [ref=e156]:
+            - tablist [ref=e157]:
+              - tab "Synchronous" [selected] [ref=e158] [cursor=pointer]:
+                - generic [ref=e159]: Synchronous
+              - tab "Asynchronous" [ref=e160] [cursor=pointer]:
+                - generic [ref=e161]: Asynchronous
+            - tabpanel "Synchronous" [ref=e162]:
+              - generic [ref=e164]:
+                - generic [ref=e165]:
+                  - text: users = db.select("users")
+                  - text: apple = db.select(RecordID("products", "apple"))
+                - button "Copy code" [ref=e166] [cursor=pointer]
+          - heading "Running SurrealQL queries" [level=3] [ref=e169]:
+            - text: Running SurrealQL queries
+            - link [ref=e170] [cursor=pointer]:
+              - /url: "#running-surrealql-queries"
+          - paragraph [ref=e172]:
+            - text: For more advanced use cases, you can use the
+            - code [ref=e173]: .query()
+            - text: method to run
+            - link "SurrealQL" [ref=e174] [cursor=pointer]:
+              - /url: /docs/reference/query-language
+            - text: statements directly. Use the
+            - code [ref=e175]: vars
+            - text: parameter to safely pass dynamic values.
+          - generic [ref=e176]:
+            - tablist [ref=e177]:
+              - tab "Synchronous" [selected] [ref=e178] [cursor=pointer]:
+                - generic [ref=e179]: Synchronous
+              - tab "Asynchronous" [ref=e180] [cursor=pointer]:
+                - generic [ref=e181]: Asynchronous
+            - tabpanel "Synchronous" [ref=e182]:
+              - generic [ref=e184]:
+                - generic [ref=e185]:
+                  - text: result = db.query(
+                  - text: "\"SELECT name, price FROM products WHERE price < $max_price ORDER BY price\","
+                  - text: "{\"max_price\": 5.00},"
+                  - text: )
+                - button "Copy code" [ref=e186] [cursor=pointer]
+          - heading "5. Closing the connection" [level=2] [ref=e189]:
+            - text: 5. Closing the connection
+            - link [ref=e190] [cursor=pointer]:
+              - /url: "#5-closing-the-connection"
+          - paragraph [ref=e192]: Always close the connection when you are done to release resources. If you use a context manager, this happens automatically.
+          - generic [ref=e193]:
+            - tablist [ref=e194]:
+              - tab "Synchronous" [selected] [ref=e195] [cursor=pointer]:
+                - generic [ref=e196]: Synchronous
+              - tab "Asynchronous" [ref=e197] [cursor=pointer]:
+                - generic [ref=e198]: Asynchronous
+            - tabpanel "Synchronous" [ref=e199]:
+              - generic [ref=e201]:
+                - generic [ref=e202]: db.close()
+                - button "Copy code" [ref=e203] [cursor=pointer]
+          - heading "What's next?" [level=2] [ref=e206]:
+            - text: What's next?
+            - link [ref=e207] [cursor=pointer]:
+              - /url: "#whats-next"
+          - paragraph [ref=e209]: You have learned how to install the SDK, connect to SurrealDB, create records, and retrieve data. There is a lot more you can do with the SDK, including updating and deleting records, handling authentication, live queries, sessions, and transactions.
+          - generic [ref=e210]:
+            - link "Connection management Learn how to manage your database connections, including protocols and context managers." [ref=e211] [cursor=pointer]:
+              - /url: /docs/languages/python/concepts/connecting-to-surrealdb
+              - paragraph [ref=e215]: Connection management
+              - paragraph [ref=e216]: Learn how to manage your database connections, including protocols and context managers.
+            - link "Authentication Read more about authentication and how to integrate it into your application." [ref=e217] [cursor=pointer]:
+              - /url: /docs/languages/python/concepts/authentication
+              - paragraph [ref=e221]: Authentication
+              - paragraph [ref=e222]: Read more about authentication and how to integrate it into your application.
+            - link "Data manipulation Learn how to create, read, update, and delete records using the SDK." [ref=e223] [cursor=pointer]:
+              - /url: /docs/languages/python/concepts/data-manipulation
+              - paragraph [ref=e227]: Data manipulation
+              - paragraph [ref=e228]: Learn how to create, read, update, and delete records using the SDK.
+            - link "API Reference Complete reference for all classes, methods, types, and errors." [ref=e229] [cursor=pointer]:
+              - /url: /docs/languages/python/api/core/surreal
+              - paragraph [ref=e233]: API Reference
+              - paragraph [ref=e234]: Complete reference for all classes, methods, types, and errors.
+      - separator [ref=e235]
+      - generic [ref=e236]:
+        - generic [ref=e237]:
+          - paragraph [ref=e238]: Was this page helpful?
+          - generic [ref=e239]:
+            - button "Yes" [ref=e240] [cursor=pointer]:
+              - generic [ref=e244]: "Yes"
+            - button "No" [ref=e245] [cursor=pointer]:
+              - generic [ref=e249]: "No"
+        - link "Edit page" [ref=e250] [cursor=pointer]:
+          - /url: https://github.com/surrealdb/docs.surrealdb.com/edit/main/src/content/index/languages/python/start.mdx
+          - button "Edit page" [ref=e251]:
+            - generic [ref=e255]: Edit page
+        - link "Report an issue" [ref=e256] [cursor=pointer]:
+          - /url: https://github.com/surrealdb/docs.surrealdb.com/issues/new
+          - button "Report an issue" [ref=e257]:
+            - generic [ref=e261]: Report an issue
+      - generic [ref=e262]:
+        - link "Previous Installation" [ref=e263] [cursor=pointer]:
+          - /url: /docs/languages/python/installation
+          - generic [ref=e266]:
+            - paragraph [ref=e267]: Previous
+            - paragraph [ref=e268]: Installation
+        - link "Next Concepts" [ref=e269] [cursor=pointer]:
+          - /url: /docs/languages/python/concepts/connecting-to-surrealdb
+          - generic [ref=e271]:
+            - paragraph [ref=e272]: Next
+            - paragraph [ref=e273]: Concepts
+      - contentinfo [ref=e275]:
+        - generic [ref=e276]:
+          - link "© SurrealDB 2026" [ref=e277] [cursor=pointer]:
+            - /url: https://github.com/surrealdb
+          - generic [ref=e278]: "|"
+          - navigation "SurrealDB footer links" [ref=e279]:
+            - link "Contributing" [ref=e280] [cursor=pointer]:
+              - /url: https://github.com/surrealdb/docs.surrealdb.com/blob/main/README.md#contributing-to-the-documentation
+            - link "Open Source" [ref=e281] [cursor=pointer]:
+              - /url: /opensource
+          - generic [ref=e282]:
+            - link "YouTube" [ref=e283] [cursor=pointer]:
+              - /url: https://www.youtube.com/@surrealdb
+            - link "Twitter" [ref=e286] [cursor=pointer]:
+              - /url: https://x.com/surrealdb
+            - link "Github" [ref=e289] [cursor=pointer]:
+              - /url: https://github.com/surrealdb
+            - link "Discord" [ref=e292] [cursor=pointer]:
+              - /url: https://discord.gg/surrealdb
+            - link "Bluesky" [ref=e295] [cursor=pointer]:
+              - /url: https://bsky.app/profile/surrealdb.com
+  - generic:
+    - generic:
+      - generic "Page feedback"

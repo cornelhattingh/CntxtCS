@@ -1,0 +1,148 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - banner "Main navigation" [ref=e4]:
+      - generic [ref=e5]:
+        - generic [ref=e6]:
+          - link [ref=e7] [cursor=pointer]:
+            - /url: /
+            - img [ref=e8]
+          - separator [ref=e9]
+          - link "SurrealDB Docs home" [ref=e10] [cursor=pointer]:
+            - /url: /docs/
+            - img [ref=e11]
+        - generic [ref=e12]:
+          - button "Toggle color scheme" [ref=e13] [cursor=pointer]
+          - link "Sign In" [ref=e16] [cursor=pointer]:
+            - /url: https://app.surrealdb.com/signin?_gl=1*6c6cw1*FPAU*MjUyNzg4NDQ3LjE3NzA3MzU0OTI.*_ga*MTUwNTkxNTcyNS4xNzcwNzM1NDky*_ga_J1NWM32T1V*czE3NzE4NDcxMTMkbzQ2JGcxJHQxNzcxODQ3MjAwJGo1NiRsMCRoNjUwODcxODU5*_fplc*dEpHdFVZdTN2eEolMkJBWkNUY1R5NUhKbmJySSUyRk56eEN6ZHlEcU52cTJzbUV0dXpOcmZhSU5MeXZFdW90bFdPZWRpbE4yTzA1dmZ1MiUyRlc5RnM3djhEZ2NVeGZhdmoyNW1rcFFsSmhwUXJzR1BoR2ZIWUdsMXYyZ0tJSXFmOW93JTNEJTNE
+            - generic [ref=e18]: Sign In
+          - button "Toggle navigation" [ref=e19] [cursor=pointer]
+    - generic [ref=e24]:
+      - generic [ref=e25]:
+        - button "Toggle sidebar" [ref=e26] [cursor=pointer]
+        - generic [ref=e30]:
+          - paragraph [ref=e31]: Languages
+          - paragraph [ref=e33]: /
+          - paragraph [ref=e34]: Python
+      - generic [ref=e35]:
+        - heading "Installation" [level=1] [ref=e36]
+        - button "Copy page" [ref=e37] [cursor=pointer]:
+          - generic [ref=e41]: Copy page
+      - paragraph [ref=e44]: In this section, you will learn how to install the Python SDK in your project.
+      - main [ref=e45]:
+        - generic [ref=e47]:
+          - paragraph [ref=e48]: In this section, you will learn how to install the Python SDK in your project.
+          - heading "Install the SDK" [level=3] [ref=e49]:
+            - text: Install the SDK
+            - link [ref=e50] [cursor=pointer]:
+              - /url: "#install-the-sdk"
+          - paragraph [ref=e52]:
+            - text: Install the
+            - link "SurrealDB SDK" [ref=e53] [cursor=pointer]:
+              - /url: https://pypi.org/project/surrealdb/
+            - text: "from PyPI:"
+          - generic [ref=e55]:
+            - generic [ref=e56]: pip install surrealdb
+            - button "Copy code" [ref=e57] [cursor=pointer]
+          - paragraph [ref=e60]:
+            - text: If you want
+            - link "pydantic" [ref=e61] [cursor=pointer]:
+              - /url: https://docs.pydantic.dev/
+            - text: validation and serialization support for
+            - code [ref=e62]: RecordID
+            - text: ", install the optional extra:"
+          - generic [ref=e64]:
+            - generic [ref=e65]: pip install surrealdb[pydantic]
+            - button "Copy code" [ref=e66] [cursor=pointer]
+          - heading "Import the SDK into your project" [level=3] [ref=e69]:
+            - text: Import the SDK into your project
+            - link [ref=e70] [cursor=pointer]:
+              - /url: "#import-the-sdk-into-your-project"
+          - paragraph [ref=e72]: The SDK provides two entry points depending on whether you need synchronous or asynchronous access.
+          - generic [ref=e74]:
+            - generic [ref=e75]: from surrealdb import Surreal
+            - button "Copy code" [ref=e76] [cursor=pointer]
+          - paragraph [ref=e79]:
+            - text: For asynchronous applications using
+            - code [ref=e80]: asyncio
+            - text: ":"
+          - generic [ref=e82]:
+            - generic [ref=e83]: from surrealdb import AsyncSurreal
+            - button "Copy code" [ref=e84] [cursor=pointer]
+          - paragraph [ref=e87]:
+            - text: Both
+            - code [ref=e88]: Surreal
+            - text: and
+            - code [ref=e89]: AsyncSurreal
+            - text: are factory functions that accept a connection URL and return the appropriate connection class based on the protocol scheme.
+          - heading "Next steps" [level=2] [ref=e90]:
+            - text: Next steps
+            - link [ref=e91] [cursor=pointer]:
+              - /url: "#next-steps"
+          - list [ref=e93]:
+            - listitem [ref=e94]:
+              - paragraph [ref=e97]:
+                - link "Quickstart" [ref=e98] [cursor=pointer]:
+                  - /url: /docs/languages/python/start
+                - text: for a complete working example
+            - listitem [ref=e99]:
+              - paragraph [ref=e102]:
+                - link "Connecting to SurrealDB" [ref=e103] [cursor=pointer]:
+                  - /url: /docs/languages/python/concepts/connecting-to-surrealdb
+                - text: for connection options and protocols
+            - listitem [ref=e104]:
+              - paragraph [ref=e107]:
+                - link "Authentication" [ref=e108] [cursor=pointer]:
+                  - /url: /docs/languages/python/concepts/authentication
+                - text: for signing in and managing credentials
+      - separator [ref=e109]
+      - generic [ref=e110]:
+        - generic [ref=e111]:
+          - paragraph [ref=e112]: Was this page helpful?
+          - generic [ref=e113]:
+            - button "Yes" [ref=e114] [cursor=pointer]:
+              - generic [ref=e118]: "Yes"
+            - button "No" [ref=e119] [cursor=pointer]:
+              - generic [ref=e123]: "No"
+        - link "Edit page" [ref=e124] [cursor=pointer]:
+          - /url: https://github.com/surrealdb/docs.surrealdb.com/edit/main/src/content/index/languages/python/installation.mdx
+          - button "Edit page" [ref=e125]:
+            - generic [ref=e129]: Edit page
+        - link "Report an issue" [ref=e130] [cursor=pointer]:
+          - /url: https://github.com/surrealdb/docs.surrealdb.com/issues/new
+          - button "Report an issue" [ref=e131]:
+            - generic [ref=e135]: Report an issue
+      - generic [ref=e136]:
+        - link "Previous Python" [ref=e137] [cursor=pointer]:
+          - /url: /docs/languages/python
+          - generic [ref=e140]:
+            - paragraph [ref=e141]: Previous
+            - paragraph [ref=e142]: Python
+        - link "Next Quickstart" [ref=e143] [cursor=pointer]:
+          - /url: /docs/languages/python/start
+          - generic [ref=e145]:
+            - paragraph [ref=e146]: Next
+            - paragraph [ref=e147]: Quickstart
+      - contentinfo [ref=e149]:
+        - generic [ref=e150]:
+          - link "© SurrealDB 2026" [ref=e151] [cursor=pointer]:
+            - /url: https://github.com/surrealdb
+          - generic [ref=e152]: "|"
+          - navigation "SurrealDB footer links" [ref=e153]:
+            - link "Contributing" [ref=e154] [cursor=pointer]:
+              - /url: https://github.com/surrealdb/docs.surrealdb.com/blob/main/README.md#contributing-to-the-documentation
+            - link "Open Source" [ref=e155] [cursor=pointer]:
+              - /url: /opensource
+          - generic [ref=e156]:
+            - link "YouTube" [ref=e157] [cursor=pointer]:
+              - /url: https://www.youtube.com/@surrealdb
+            - link "Twitter" [ref=e160] [cursor=pointer]:
+              - /url: https://x.com/surrealdb
+            - link "Github" [ref=e163] [cursor=pointer]:
+              - /url: https://github.com/surrealdb
+            - link "Discord" [ref=e166] [cursor=pointer]:
+              - /url: https://discord.gg/surrealdb
+            - link "Bluesky" [ref=e169] [cursor=pointer]:
+              - /url: https://bsky.app/profile/surrealdb.com
+  - generic:
+    - generic:
+      - generic "Page feedback"
