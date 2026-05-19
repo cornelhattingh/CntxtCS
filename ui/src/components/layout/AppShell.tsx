@@ -2,6 +2,7 @@ import type { ReactNode } from 'react'
 import { Outlet } from 'react-router-dom'
 import { Sidebar } from './Sidebar'
 import { ProjectSelector } from './ProjectSelector'
+import { PageTitle } from './PageTitle'
 
 export function AppShell({ children }: { children?: ReactNode }) {
   return (
@@ -10,7 +11,7 @@ export function AppShell({ children }: { children?: ReactNode }) {
       <div className="flex flex-col flex-1 min-w-0">
         {/* Top bar */}
         <header className="flex items-center justify-between px-6 py-3 border-b shrink-0">
-          <span className="text-sm font-medium text-muted-foreground">Project</span>
+          <PageTitle />
           <ProjectSelector />
         </header>
         {/* Main content */}
