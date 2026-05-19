@@ -25,17 +25,22 @@ export function DashboardPage() {
   const [loading, setLoading] = useState(false)
   const [scanning, setScanning] = useState(false)
   const [scanError, setScanError] = useState<string | null>(null)
+  const [fetchError, setFetchError] = useState<string | null>(null)
 
   const loadData = (project: string) => {
     setLoading(true)
     setStats(null)
     setDeps([])
+    setFetchError(null)
+    setScanError(null)
     Promise.all([
-      api.getStats(project).catch(() => null),
-      api.getDependencies(project).catch(() => []),
+      api.getStats(project),
+      api.getDependencies(project),
     ]).then(([s, d]) => {
       setStats(s)
       setDeps(d ?? [])
+    }).catch(err => {
+      setFetchError(err instanceof Error ? err.message : 'Failed to load project data. Is the server running?')
     }).finally(() => setLoading(false))
   }
 
@@ -113,6 +118,10 @@ export function DashboardPage() {
 
       {scanError && (
         <p className="text-sm text-destructive">{scanError}</p>
+      )}
+
+      {fetchError && (
+        <p className="text-sm text-destructive">{fetchError}</p>
       )}
 
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">

@@ -14,6 +14,7 @@ export function ExplorerPage() {
   const [namespaces, setNamespaces] = useState<string[]>([])
   const [files, setFiles] = useState<FileInfo[]>([])
   const [loading, setLoading] = useState(false)
+  const [fetchError, setFetchError] = useState<string | null>(null)
 
   useEffect(() => {
     if (!selected) return
@@ -22,16 +23,19 @@ export function ExplorerPage() {
     setInterfaces([])
     setNamespaces([])
     setFiles([])
+    setFetchError(null)
     Promise.all([
-      api.getClasses(selected).catch(() => []),
-      api.getInterfaces(selected).catch(() => []),
-      api.getNamespaces(selected).catch(() => []),
-      api.getFiles(selected).catch(() => []),
+      api.getClasses(selected),
+      api.getInterfaces(selected),
+      api.getNamespaces(selected),
+      api.getFiles(selected),
     ]).then(([c, i, n, f]) => {
       setClasses(c)
       setInterfaces(i)
       setNamespaces(n)
       setFiles(f)
+    }).catch(err => {
+      setFetchError(err instanceof Error ? err.message : 'Failed to load project data. Is the server running?')
     }).finally(() => setLoading(false))
   }, [selected])
 
@@ -49,6 +53,9 @@ export function ExplorerPage() {
         <h1 className="text-2xl font-bold">{selected}</h1>
         <p className="text-sm text-muted-foreground mt-0.5">Code explorer</p>
       </div>
+      {fetchError && (
+        <p className="text-sm text-destructive">{fetchError}</p>
+      )}
       <Tabs defaultValue="classes">
         <TabsList>
           <TabsTrigger value="classes">
