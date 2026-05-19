@@ -1,18 +1,119 @@
 """MCP server exposing CntxtCS C# knowledge graph tools for AI agents."""
 
 import os
+import sys
+import threading
 from typing import Any
 from mcp.server.fastmcp import FastMCP
 from surreal_storage import SurrealStorage
 
+# ── Serve-mode state ───────────────────────────────────────────────────────────
+# Set at startup when --directory / --project are passed to main().
+_serve_config: dict[str, str | None] = {
+    "directory": None,
+    "project": None,
+}
+
 mcp = FastMCP(
     "cntxtcs",
     instructions=(
-        "This server provides tools to explore a C# codebase knowledge graph. "
-        "Call list_projects() first to discover available projects, then pass the "
-        "project name to other tools."
+        "This server provides tools to explore C# codebase knowledge graphs stored in SurrealDB. "
+        "Call list_projects() first to see available projects, then use the project name in other tools. "
+        "Call reanalyze() to refresh data after the codebase changes. "
+        "The server can be started with --directory and --project to auto-analyse at startup, "
+        "and --watch to auto-refresh whenever .cs files change."
     ),
 )
+
+
+# ── Analysis helper ────────────────────────────────────────────────────────────
+
+def _run_analysis(directory: str, project: str) -> dict[str, Any]:
+    """Run codebase analysis and upsert the result into SurrealDB.
+    
+    Returns a stats dict with totals for files, classes, methods, etc.
+    """
+    from CntxtCS import CSCodeKnowledgeGraph  # imported here to avoid circular deps
+
+    print(f"[cntxtcs] Analysing '{directory}' → project '{project}'...", file=sys.stderr, flush=True)
+    ckg = CSCodeKnowledgeGraph(directory=directory)
+    ckg.analyze_codebase()
+
+    stats = {
+        "total_files": ckg.total_files,
+        "total_namespaces": ckg.total_namespaces,
+        "total_classes": ckg.total_classes,
+        "total_methods": ckg.total_methods,
+        "total_interfaces": ckg.total_interfaces,
+        "total_enums": ckg.total_enums,
+        "total_structs": ckg.total_structs,
+        "total_dependencies": len(ckg.total_dependencies),
+        "total_usings": ckg.total_usings,
+    }
+    with SurrealStorage(project) as storage:
+        storage.store_graph(ckg.graph, {"stats": stats})
+
+    print(
+        f"[cntxtcs] Analysis complete: {stats['total_classes']} classes, "
+        f"{stats['total_methods']} methods",
+        file=sys.stderr,
+        flush=True,
+    )
+    return stats
+
+
+# ── File watcher ───────────────────────────────────────────────────────────────
+
+_WATCHED_EXTENSIONS = {".cs", ".csproj"}
+_DEBOUNCE_SECONDS = 3.0
+
+
+def _start_watcher(directory: str, project: str) -> None:
+    """Start a background daemon thread that watches *directory* for .cs/.csproj
+    changes and triggers a debounced re-analysis.
+    
+    Requires the ``watchdog`` package (included in project dependencies).
+    """
+    try:
+        from watchdog.observers import Observer
+        from watchdog.events import FileSystemEventHandler
+    except ImportError:
+        print(
+            "[cntxtcs] watchdog not installed — file watching disabled. "
+            "Run: uv sync",
+            file=sys.stderr,
+        )
+        return
+
+    _timer_ref: list[threading.Timer | None] = [None]
+    _lock = threading.Lock()
+
+    def _debounced_trigger() -> None:
+        try:
+            _run_analysis(directory, project)
+        except Exception as exc:
+            print(f"[cntxtcs] Auto re-analysis error: {exc}", file=sys.stderr, flush=True)
+
+    class _CSharpHandler(FileSystemEventHandler):
+        def on_any_event(self, event) -> None:  # type: ignore[override]
+            if event.is_directory:
+                return
+            src = getattr(event, "src_path", "")
+            if not any(src.endswith(ext) for ext in _WATCHED_EXTENSIONS):
+                return
+            with _lock:
+                if _timer_ref[0] is not None:
+                    _timer_ref[0].cancel()
+                t = threading.Timer(_DEBOUNCE_SECONDS, _debounced_trigger)
+                t.daemon = True
+                _timer_ref[0] = t
+                t.start()
+
+    observer = Observer()
+    observer.schedule(_CSharpHandler(), directory, recursive=True)
+    observer.daemon = True  # type: ignore[assignment]
+    observer.start()
+    print(f"[cntxtcs] Watching '{directory}' for changes (debounce {_DEBOUNCE_SECONDS}s)...", file=sys.stderr, flush=True)
 
 
 def _q(project: str, surql: str, params: dict | None = None) -> list:
@@ -280,8 +381,102 @@ def search_code_elements(
     return results
 
 
-def main():
-    """Entry point for the cntxtcs-mcp script."""
+# ── Reanalyze tool ────────────────────────────────────────────────────────────
+
+@mcp.tool()
+def reanalyze(
+    project: str | None = None,
+    directory: str | None = None,
+) -> dict[str, Any]:
+    """Re-analyse a C# codebase and refresh the SurrealDB knowledge graph.
+    
+    Use this after the codebase has changed to get up-to-date results from all
+    other tools. Can also be called from CI/CD pipelines or git hooks.
+    
+    If the server was started with --directory and --project those values are
+    used as defaults, so you can call reanalyze() with no arguments in that case.
+    
+    Args:
+        project: Project name to update. Falls back to the server startup value.
+        directory: Absolute path to the C# codebase. Falls back to server startup value.
+    
+    Returns a stats dict: total_files, total_classes, total_methods, etc.
+    """
+    _project = project or _serve_config["project"]
+    _directory = directory or _serve_config["directory"]
+
+    if not _project:
+        return {"error": "project name required — pass 'project' or start the server with --project"}
+    if not _directory:
+        return {"error": "directory required — pass 'directory' or start the server with --directory"}
+    if not os.path.isdir(_directory):
+        return {"error": f"directory does not exist: {_directory}"}
+
+    try:
+        return _run_analysis(_directory, _project)
+    except Exception as exc:
+        return {"error": str(exc)}
+
+
+# ── Entry point ────────────────────────────────────────────────────────────────
+
+def main() -> None:
+    """Entry point for the cntxtcs-mcp script.
+    
+    Without arguments: start the MCP server (tools query pre-existing SurrealDB data).
+    With --directory + --project: analyse the codebase first, then start the server.
+    With --watch: also watch for .cs file changes and auto re-analyse.
+    
+    Examples::
+    
+        uv run python mcp_server.py
+        uv run python mcp_server.py --directory ./MyProject --project my-api
+        uv run python mcp_server.py --directory ./MyProject --project my-api --watch
+    """
+    import argparse
+
+    parser = argparse.ArgumentParser(
+        description="CntxtCS MCP server — exposes C# knowledge graph tools to AI agents",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    parser.add_argument(
+        "--directory", "-d",
+        metavar="PATH",
+        help="Path to the C# codebase. When combined with --project, analyses the codebase at startup.",
+    )
+    parser.add_argument(
+        "--project", "-p",
+        metavar="NAME",
+        help="SurrealDB project name (database). Required when --directory is used.",
+    )
+    parser.add_argument(
+        "--watch", "-w",
+        action="store_true",
+        help="Watch the directory for .cs/.csproj changes and auto re-analyse. Requires --directory and --project.",
+    )
+    args = parser.parse_args()
+
+    if args.directory and not args.project:
+        parser.error("--project NAME is required when --directory is specified")
+    if args.watch and not args.directory:
+        parser.error("--watch requires --directory and --project")
+
+    # Store for use by the reanalyze() tool at runtime
+    _serve_config["directory"] = args.directory
+    _serve_config["project"] = args.project
+
+    # Run initial analysis before binding the MCP transport
+    if args.directory and args.project:
+        try:
+            _run_analysis(args.directory, args.project)
+        except Exception as exc:
+            print(f"[cntxtcs] Initial analysis failed: {exc}", file=sys.stderr, flush=True)
+            sys.exit(1)
+
+    # Start background file watcher
+    if args.watch:
+        _start_watcher(args.directory, args.project)  # type: ignore[arg-type]
+
     mcp.run()
 
 

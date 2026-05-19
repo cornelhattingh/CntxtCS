@@ -142,3 +142,62 @@ class TestFindImplementations:
         import mcp_server
         result = mcp_server.find_implementations(TEST_PROJECT, "IUserService")
         assert "UserService" in result
+
+
+class TestReanalyze:
+    def test_reanalyze_uses_serve_config_defaults(self, seeded, tmp_path, monkeypatch):
+        """reanalyze() with no args should use _serve_config values."""
+        import mcp_server
+
+        cs_file = tmp_path / "Empty.cs"
+        cs_file.write_text("namespace Test { public class Empty {} }")
+
+        fake_stats = {
+            "total_files": 1, "total_classes": 1, "total_methods": 0,
+            "total_namespaces": 1, "total_interfaces": 0, "total_enums": 0,
+            "total_structs": 0, "total_dependencies": 0, "total_usings": 0,
+        }
+        monkeypatch.setattr("mcp_server._run_analysis", lambda d, p: fake_stats)
+        monkeypatch.setitem(mcp_server._serve_config, "directory", str(tmp_path))
+        monkeypatch.setitem(mcp_server._serve_config, "project", TEST_PROJECT)
+
+        result = mcp_server.reanalyze()
+        assert isinstance(result, dict)
+        assert "error" not in result
+        assert "total_files" in result
+
+    def test_reanalyze_explicit_args(self, seeded, tmp_path, monkeypatch):
+        """reanalyze() with explicit args should call _run_analysis and return stats."""
+        import mcp_server
+
+        cs_file = tmp_path / "Service.cs"
+        cs_file.write_text("namespace MyNs { public class Service {} }")
+
+        fake_stats = {
+            "total_files": 1, "total_classes": 1, "total_methods": 0,
+            "total_namespaces": 1, "total_interfaces": 0, "total_enums": 0,
+            "total_structs": 0, "total_dependencies": 0, "total_usings": 0,
+        }
+        monkeypatch.setattr("mcp_server._run_analysis", lambda d, p: fake_stats)
+
+        result = mcp_server.reanalyze(project=TEST_PROJECT, directory=str(tmp_path))
+        assert isinstance(result, dict)
+        assert "error" not in result
+        assert result.get("total_classes", 0) >= 1
+
+    def test_reanalyze_missing_project_returns_error(self, seeded, monkeypatch):
+        """reanalyze() with no project and no serve_config should return error dict."""
+        import mcp_server
+        monkeypatch.setitem(mcp_server._serve_config, "directory", None)
+        monkeypatch.setitem(mcp_server._serve_config, "project", None)
+
+        result = mcp_server.reanalyze()
+        assert isinstance(result, dict)
+        assert "error" in result
+
+    def test_reanalyze_nonexistent_directory_returns_error(self, seeded):
+        """reanalyze() with a bad path should return error dict."""
+        import mcp_server
+        result = mcp_server.reanalyze(project=TEST_PROJECT, directory="/nonexistent/path")
+        assert isinstance(result, dict)
+        assert "error" in result

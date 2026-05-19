@@ -100,9 +100,24 @@ The MCP server exposes your stored knowledge graphs as tools that AI agents (Git
 
 ### Starting the server
 
+The MCP server has two modes:
+
+**Query-only** (pre-existing SurrealDB data required):
 ```bash
 uv run python mcp_server.py
 ```
+
+**Serve mode** — analyse the codebase first, then start the server:
+```bash
+uv run python mcp_server.py --directory ./MyProject --project my-api
+```
+
+**Serve + watch** — auto re-analyse whenever `.cs` or `.csproj` files change:
+```bash
+uv run python mcp_server.py --directory ./MyProject --project my-api --watch
+```
+
+This is the recommended mode for local development and deployment — a single command handles everything.
 
 ### Configuring in VS Code (GitHub Copilot)
 
@@ -114,7 +129,12 @@ Add to your `.vscode/mcp.json` (or user-level `mcp.json`):
     "cntxtcs": {
       "type": "stdio",
       "command": "uv",
-      "args": ["run", "python", "mcp_server.py"],
+      "args": [
+        "run", "python", "mcp_server.py",
+        "--directory", "/path/to/your/csharp/project",
+        "--project", "my-api",
+        "--watch"
+      ],
       "cwd": "/path/to/CntxtCS"
     }
   }
@@ -130,11 +150,28 @@ Add to `claude_desktop_config.json`:
   "mcpServers": {
     "cntxtcs": {
       "command": "uv",
-      "args": ["run", "python", "mcp_server.py"],
+      "args": [
+        "run", "python", "mcp_server.py",
+        "--directory", "/path/to/your/csharp/project",
+        "--project", "my-api",
+        "--watch"
+      ],
       "cwd": "/path/to/CntxtCS"
     }
   }
 }
+```
+
+### Triggering re-analysis from CI/CD or git hooks
+
+The `reanalyze()` MCP tool lets agents (or scripts) trigger a fresh analysis at any time. For automated pipelines, call it via the MCP client, or set up a **post-commit git hook**:
+
+```bash
+# .git/hooks/post-commit
+#!/bin/sh
+# Re-analyse after every commit so the knowledge graph stays current.
+# Requires the MCP server to be running with --directory and --project.
+uv run python CntxtCS.py "$(git rev-parse --show-toplevel)" --surreal --project my-api
 ```
 
 ### Available MCP Tools
